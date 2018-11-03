@@ -64,8 +64,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        firebaseAuth = FirebaseAuth.getInstance();
-
         buttonRegister = (Button) findViewById(R.id.buttonRegister);
         editTextEmail = (EditText) findViewById(R.id.editTextEmail);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
@@ -79,6 +77,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         progressDialog = new ProgressDialog(this);
         progressBar = new ProgressBar(this);
 
+        firebaseAuth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
@@ -103,7 +102,6 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         }
         if(view == textViewLogin) {
             //Start Login activity
-            //startActivity(new Intent(this, LoginActivity.class));
             startLoginActivity();
         }
     }
