@@ -47,10 +47,6 @@ public class MainActivity extends AppCompatActivity
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
         user = firebaseAuth.getCurrentUser();
-        ImageView imageView = (ImageView) findViewById(R.id.navProfilePicture);
-
-
-
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -103,8 +99,6 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         return super.onOptionsItemSelected(item);
     }
-
-
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override

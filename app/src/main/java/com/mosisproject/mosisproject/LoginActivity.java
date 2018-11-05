@@ -29,10 +29,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText editTextEmail;
     private  EditText editTextPassword;
     private TextView textViewRegister;
-
     private FirebaseAuth firebaseAuth;
     private ProgressDialog progressDialog;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
