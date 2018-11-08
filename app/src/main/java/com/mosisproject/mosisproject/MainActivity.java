@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            // Handle the camera action
+            startBluetoothActivity();
         } else if (id == R.id.nav_gallery) {
 
         } else if (id == R.id.nav_slideshow) {
@@ -117,9 +117,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_logout) {
-            firebaseAuth.signOut();
-            startLoginActivity();
-            Toast.makeText(MainActivity.this, "Log out successfully.", Toast.LENGTH_LONG).show();
+            userLogout();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -129,6 +127,17 @@ public class MainActivity extends AppCompatActivity
 
     public void startLoginActivity() {
         startActivity(new Intent(this, LoginActivity.class));
+    }
+
+    public void startBluetoothActivity() {
+        startActivity(new Intent(this, BluetoothActivity.class));
+    }
+
+    private void userLogout() {
+        firebaseAuth.signOut();
+        finish(); // Closing activity
+        startLoginActivity();
+        Toast.makeText(MainActivity.this, "Log out successfully.", Toast.LENGTH_LONG).show();
     }
 
     private void updateNavigationProfile(NavigationView navigationView) {
