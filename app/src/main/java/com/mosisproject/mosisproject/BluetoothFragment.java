@@ -36,9 +36,9 @@ import com.mosisproject.mosisproject.service.BluetoothConnectionService;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class BluetoothActivity extends AppCompatActivity {
+public class BluetoothFragment extends AppCompatActivity {
 
-    private static final String TAG = BluetoothActivity.class.getSimpleName();
+    private static final String TAG = BluetoothFragment.class.getSimpleName();
     private TextView status;
     private Button btnConnect;
     private ListView listView;
@@ -68,7 +68,7 @@ public class BluetoothActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_bluetooth);
+        setContentView(R.layout.fragment_bluetooth);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         findViewsByIds();
 

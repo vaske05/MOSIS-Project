@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startBluetoothActivity() {
-        startActivity(new Intent(this, BluetoothActivity.class));
+        startActivity(new Intent(this, BluetoothFragment.class));
     }
 
     private void userLogout() {
