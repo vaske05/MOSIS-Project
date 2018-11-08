@@ -21,6 +21,8 @@ import android.graphics.Bitmap;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -141,7 +143,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()) {
                             //Store user
-                            storeUser(name, surname, email, phone);
+                            List<String> friends= new ArrayList<>();
+                            friends.add("init");
+                            storeUser(name, surname, email, phone, friends);
                             //Store profile image
                             storeImage();
                             //saveImage();
@@ -176,8 +180,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 });
     }
 
-    private void storeUser(String name, String surname, String email, String phone) {
-        User user = new User(name, surname, email, phone);
+    private void storeUser(String name, String surname, String email, String phone, List<String > friends) {
+        User user = new User(name, surname, email, phone, friends);
         database.getReference("Users")
                 .child(firebaseAuth.getCurrentUser().getUid())
                 .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {

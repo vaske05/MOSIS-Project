@@ -26,10 +26,10 @@ public class BluetoothConnectionService {
     private ReadWriteThread connectedThread;
     private int state;
 
-    static final int STATE_NONE = 0;
-    static final int STATE_LISTEN = 1;
-    static final int STATE_CONNECTING = 2;
-    static final int STATE_CONNECTED = 3;
+    public static final int STATE_NONE = 0;
+    public static final int STATE_LISTEN = 1;
+    public static final int STATE_CONNECTING = 2;
+    public static final int STATE_CONNECTED = 3;
 
 
     public BluetoothConnectionService(Context context, Handler handler) {
@@ -197,6 +197,7 @@ public class BluetoothConnectionService {
             while (state != STATE_CONNECTED) {
                 try {
                     socket = serverSocket.accept();
+                    //socket.close();
                 }
                 catch (IOException e) {
                     e.printStackTrace();

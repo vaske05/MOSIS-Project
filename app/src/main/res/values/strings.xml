@@ -23,4 +23,7 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_logout">Log out</string>
+
+    <string name="none_paired">No devices have been paired</string>
+    <string name="none_found">No devices found</string>
 </resources>

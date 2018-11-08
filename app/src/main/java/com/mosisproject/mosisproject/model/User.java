@@ -1,5 +1,6 @@
 package com.mosisproject.mosisproject.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class User {
@@ -12,11 +13,12 @@ public class User {
     public User() {
     }
 
-    public User(String name, String surname, String email, String phone) {
+    public User(String name, String surname, String email, String phone, List<String> friends) {
         this.name = name;
         this.surname = surname;
         this.phone = phone;
         this.email = email;
+        this.friendsList = friends;
     }
 
     public List<String> getFriendsList() {
@@ -29,5 +31,37 @@ public class User {
 
     public void addFriend(String friend) {
         this.friendsList.add(friend);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
