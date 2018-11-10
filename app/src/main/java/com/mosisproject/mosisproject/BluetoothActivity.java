@@ -12,9 +12,13 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -36,9 +40,9 @@ import com.mosisproject.mosisproject.service.BluetoothConnectionService;
 import java.util.ArrayList;
 import java.util.Set;
 
-public class BluetoothFragment extends AppCompatActivity {
+public class BluetoothActivity extends AppCompatActivity {
 
-    private static final String TAG = BluetoothFragment.class.getSimpleName();
+    private static final String TAG = BluetoothActivity.class.getSimpleName();
     private TextView status;
     private Button btnConnect;
     private ListView listView;
@@ -68,7 +72,8 @@ public class BluetoothFragment extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.fragment_bluetooth);
+
+        setContentView(R.layout.activity_bluetooth);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         findViewsByIds();
 
@@ -88,6 +93,18 @@ public class BluetoothFragment extends AppCompatActivity {
         chatMessages = new ArrayList<>();
         chatAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, chatMessages);
         listView.setAdapter(chatAdapter);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private Handler handler = new Handler(new Handler.Callback() {

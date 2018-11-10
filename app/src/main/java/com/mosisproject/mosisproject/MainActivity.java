@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity
         storageReference = firebaseStorage.getReference();
         user = firebaseAuth.getCurrentUser();
 
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -107,8 +109,10 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_camera) {
-            startBluetoothActivity();
+            //startBluetoothActivity();
         } else if (id == R.id.nav_gallery) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, new FriendsFragment(),"fragment_friends").commit();
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -130,7 +134,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void startBluetoothActivity() {
-        startActivity(new Intent(this, BluetoothFragment.class));
+        startActivity(new Intent(this, BluetoothActivity.class));
     }
 
     private void userLogout() {

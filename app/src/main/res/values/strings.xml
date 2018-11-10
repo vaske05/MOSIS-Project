@@ -26,4 +26,7 @@
 
     <string name="none_paired">No devices have been paired</string>
     <string name="none_found">No devices found</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
