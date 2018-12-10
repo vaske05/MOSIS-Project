@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -108,11 +109,18 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            //startBluetoothActivity();
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.friends_list) {
+            FriendsFragment friendsFragment = new FriendsFragment();
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new FriendsFragment(),"fragment_friends").commit();
+                    .replace(R.id.fragment_container, friendsFragment,"fragment_friends").commit();
+            String tag = friendsFragment.getTag();
+            Log.w("TAG:", tag);
+            //startBluetoothActivity();
+        } else if (id == R.id.add_friend) {
+            AddFriendFragment addFriendFragment = new AddFriendFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, addFriendFragment, "fragment_addFriend").commit();
+
 
         } else if (id == R.id.nav_slideshow) {
 

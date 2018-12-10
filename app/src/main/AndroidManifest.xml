@@ -26,11 +26,9 @@
             android:name=".RegisterActivity"
             android:label="@string/title_activity_registration"></activity>
         <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login">
+            android:name=".LoginActivity">
             <intent-filter android:label="@string/name_in_icon_launcher">
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
