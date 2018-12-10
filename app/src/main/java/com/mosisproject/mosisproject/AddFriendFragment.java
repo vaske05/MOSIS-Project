@@ -1,26 +1,26 @@
 package com.mosisproject.mosisproject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.MenuItem;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -42,9 +42,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public class BluetoothActivity extends AppCompatActivity {
 
-    private static final String TAG = BluetoothActivity.class.getSimpleName();
+public class AddFriendFragment extends Fragment {
+
+    //--
+    private static final String TAG = AddFriendFragment.class.getSimpleName();
     private TextView status;
     private Button btnConnect;
     private ListView listView;
@@ -70,14 +72,52 @@ public class BluetoothActivity extends AppCompatActivity {
     private BluetoothDevice connectingDevice;
     private ArrayAdapter<String> discoveredDevicesAdapter;
 
+    boolean friendshipSuccess;
+    //--
+
+
+
+
+    private OnFragmentInteractionListener mListener;
+
+    public AddFriendFragment() {
+        // Required empty public constructor
+    }
+
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+    }
 
-        setContentView(R.layout.activity_bluetooth);
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        View view = inflater.inflate(R.layout.fragment_add_friend, container, false);
+
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        findViewsByIds();
+        //findViewsByIds(view);
+        //--
+        status = (TextView) view.findViewById(R.id.status);
+        btnConnect = (Button) view.findViewById(R.id.btn_connect);
+        listView = (ListView) view.findViewById(R.id.list);
+        inputLayout = (TextInputLayout) view.findViewById(R.id.input_layout);
+        btnSend = (Button) view.findViewById(R.id.btn_send);
+
+        inputLayout.getEditText().setText("");
+
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final String userId = firebaseUser.getUid();
+                sendMessage(userId);
+            }
+        });
+
+        //--
 
         //check device support bluetooth
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -93,31 +133,11 @@ public class BluetoothActivity extends AppCompatActivity {
 
         //set chat adapter
         chatMessages = new ArrayList<>();
-        chatAdapter = new ArrayAdapter<>(this,android.R.layout.simple_list_item_1, chatMessages);
+        chatAdapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1, chatMessages);
         listView.setAdapter(chatAdapter);
 
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-
-            //FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            //ft.detach(FriendsFragment.).attach(YourFragment.this).commit();
-
-            //mainActivity.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new FriendsFragment(),"fragment_friends").commit();
-            //FragmentManager fm = getSupportFragmentManager();
-
-//            FragmentManager fm = getSupportFragmentManager();
-//            FriendsFragment f = (myFragment) fm.findFragmentByTag("myfragmentTag");
-//            f.att
-
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        // Inflate the layout for this fragment
+        return view;
     }
 
     private Handler handler = new Handler(new Handler.Callback() {
@@ -150,18 +170,58 @@ public class BluetoothActivity extends AppCompatActivity {
                 case MESSAGE_READ:
                     byte[] readBuffer = (byte[]) msg.obj;
                     final String readMessage = new String(readBuffer, 0, msg.arg1);
+                    friendshipSuccess = false;
 
                     databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(firebaseUser.getUid());
                     databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            User user = dataSnapshot.getValue(User.class);
+                        public void onDataChange(@NonNull final DataSnapshot dataSnapshot) {
+                            final User user = dataSnapshot.getValue(User.class);
                             if(!checkFriendship(user, readMessage)) {
-                                user.addFriend(readMessage); //Add new friend
-                                databaseReference.setValue(user);
+
+                                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        switch (which){
+                                            case DialogInterface.BUTTON_POSITIVE:
+                                                //Yes button clicked
+                                                user.addFriend(readMessage); //Add new friend
+                                                databaseReference.setValue(user);
+
+                                                databaseReference = FirebaseDatabase.getInstance().getReference().child("Users").child(readMessage);
+                                                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                                        final User userSender = dataSnapshot.getValue(User.class);
+                                                        userSender.addFriend(user.getId()); //Add new friend
+                                                        databaseReference.setValue(userSender);
+                                                        friendshipSuccess = true;
+                                                        Toast.makeText(getContext(), "You became friend with. " + connectingDevice.getName(), Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                                    }
+                                                });
+
+
+
+                                                break;
+
+                                            case DialogInterface.BUTTON_NEGATIVE:
+                                                //No button clicked
+                                                break;
+                                        }
+                                    }
+                                };
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setMessage(connectingDevice.getName() + " wants to be a friend with you.").setPositiveButton("Yes", dialogClickListener)
+                                        .setNegativeButton("No", dialogClickListener).show();
                             }
                             else {
-                                Toast.makeText(getApplicationContext(), "You are already friends.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "You are already friends.", Toast.LENGTH_SHORT).show();
                             }
 
                         }
@@ -178,10 +238,12 @@ public class BluetoothActivity extends AppCompatActivity {
                     break;
                 case MESSAGE_DEVICE_OBJECT:
                     connectingDevice = msg.getData().getParcelable(DEVICE_OBJECT);
-                    Toast.makeText(getApplicationContext(), "Connected to " + connectingDevice.getName(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Connected to " + connectingDevice.getName(), Toast.LENGTH_SHORT).show();
                     break;
                 case MESSAGE_TOAST:
-                    Toast.makeText(getApplicationContext(), msg.getData().getString("toast"), Toast.LENGTH_SHORT).show();
+                    if(getContext() != null) {
+                        Toast.makeText(getActivity().getApplicationContext(), msg.getData().getString("toast"), Toast.LENGTH_SHORT).show();
+                    }
                     break;
             }
             return false;
@@ -205,7 +267,7 @@ public class BluetoothActivity extends AppCompatActivity {
     }
 
     private void showPrinterPickDialog() {
-        dialog = new Dialog(this);
+        dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.device_adapter_view);
         dialog.setTitle("Bluetooth Devices");
 
@@ -215,8 +277,8 @@ public class BluetoothActivity extends AppCompatActivity {
         bluetoothAdapter.startDiscovery();
 
         //Initializing bluetooth adapters
-        ArrayAdapter<String> pairedDevicesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
-        discoveredDevicesAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+        ArrayAdapter<String> pairedDevicesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        discoveredDevicesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
 
         //locate listviews and attatch the adapters
         ListView listViewPaired = (ListView) dialog.findViewById(R.id.pairedDeviceList);
@@ -226,11 +288,11 @@ public class BluetoothActivity extends AppCompatActivity {
 
         // Register for broadcasts when a device is discovered
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(discoveryFinishReceiver, filter);
+        getActivity().registerReceiver(discoveryFinishReceiver, filter);
 
         // Register for broadcasts when discovery has finished
         filter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
-        registerReceiver(discoveryFinishReceiver, filter);
+        getActivity().registerReceiver(discoveryFinishReceiver, filter);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
@@ -280,7 +342,10 @@ public class BluetoothActivity extends AppCompatActivity {
         });
         dialog.setCancelable(false);
         dialog.show();
+
     }
+
+
 
     private void setStatus(String s) {
         status.setText(s);
@@ -292,50 +357,12 @@ public class BluetoothActivity extends AppCompatActivity {
         chatController.connect(device);
     }
 
-    private void findViewsByIds() {
-        status = (TextView) findViewById(R.id.status);
-        btnConnect = (Button) findViewById(R.id.btn_connect);
-        listView = (ListView) findViewById(R.id.list);
-        inputLayout = (TextInputLayout) findViewById(R.id.input_layout);
-        btnSend = (Button) findViewById(R.id.btn_send);
 
-        inputLayout.getEditText().setText("");
-
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String userId = firebaseUser.getUid();
-                sendMessage(userId);
-            }
-        });
-    }
-
-
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_ENABLE_BLUETOOTH:
-                if (resultCode == Activity.RESULT_OK) {
-                    chatController = new BluetoothConnectionService(this,handler);
-                }
-                else {
-                    Toast.makeText(this, "Bluetooth still disabled, turn off application", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-        }
-
-    }
-
-    private void checkBluetoothSupport(BluetoothAdapter bluetoothAdapter) {
-        if(bluetoothAdapter == null) {
-            Toast.makeText(this,"Bluetooth is not available.", Toast.LENGTH_LONG).show();
-            finish();
-        }
-    }
 
     private void sendMessage(String message) {
         if(chatController.getState() != BluetoothConnectionService.STATE_CONNECTED) {
-            Toast.makeText(this,"Connection was lost!", Toast.LENGTH_SHORT).show();
+            Toast.makeText( getContext(),"Connection was lost!", Toast.LENGTH_SHORT).show();
+
             return;
         }
 
@@ -345,21 +372,85 @@ public class BluetoothActivity extends AppCompatActivity {
         }
     }
 
+    private void checkBluetoothSupport(BluetoothAdapter bluetoothAdapter) {
+        if(bluetoothAdapter == null) {
+            Toast.makeText(getContext(),"Bluetooth is not available.", Toast.LENGTH_LONG).show();
+            getActivity().finish(); //TODO proveri da li radi
+        }
+    }
+
+
+
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+/*
     @Override
-    protected void onStart() {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+*/
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case REQUEST_ENABLE_BLUETOOTH:
+                if (resultCode == Activity.RESULT_OK) {
+                    chatController = new BluetoothConnectionService(getContext(),handler);
+                }
+                else {
+                    Toast.makeText(getContext(), "Bluetooth still disabled, turn off application", Toast.LENGTH_SHORT).show();
+                    getActivity().finish();
+                }
+        }
+    }
+
+    @Override
+    public void onStart() {
         super.onStart();
         if (!bluetoothAdapter.isEnabled()) {
             Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableIntent, REQUEST_ENABLE_BLUETOOTH);
         }
         else {
-            chatController = new BluetoothConnectionService(this, handler);
+            chatController = new BluetoothConnectionService(getContext(), handler);
         }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+
         if(chatController != null) {
             if (chatController.getState() == BluetoothConnectionService.STATE_NONE) {
                 chatController.start();
@@ -368,7 +459,7 @@ public class BluetoothActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         if(chatController != null) {
             chatController.stop();
@@ -380,7 +471,7 @@ public class BluetoothActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
 
-           // discoveredDevicesAdapter.clear();
+            // discoveredDevicesAdapter.clear();
 
             if(BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);

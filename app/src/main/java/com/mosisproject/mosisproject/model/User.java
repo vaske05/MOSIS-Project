@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
+    public String id;
     public String name;
     public String surname;
     public String phone;
@@ -13,7 +14,8 @@ public class User {
     public User() {
     }
 
-    public User(String name, String surname, String email, String phone, List<String> friends) {
+    public User(String id, String name, String surname, String email, String phone, List<String> friends) {
+        this.id = id;
         this.name = name;
         this.surname = surname;
         this.phone = phone;
@@ -31,6 +33,15 @@ public class User {
 
     public void addFriend(String friend) {
         this.friendsList.add(friend);
+    }
+
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {

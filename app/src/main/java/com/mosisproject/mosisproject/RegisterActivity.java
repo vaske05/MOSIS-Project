@@ -181,7 +181,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     }
 
     private void storeUser(String name, String surname, String email, String phone, List<String > friends) {
-        User user = new User(name, surname, email, phone, friends);
+        String userId = firebaseAuth.getUid();
+        User user = new User(userId, name, surname, email, phone, friends);
         database.getReference("Users")
                 .child(firebaseAuth.getCurrentUser().getUid())
                 .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {

@@ -85,6 +85,12 @@ public class FriendsFragment extends Fragment {
         startActivity(new Intent(getActivity(), BluetoothActivity.class));
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
+    }
+
     public void getFriends() {
         firebaseDatabase.getReference().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

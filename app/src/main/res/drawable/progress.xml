@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <rotate xmlns:android="http://schemas.android.com/apk/res/android"
     android:pivotX="50%" android:pivotY="50%" android:fromDegrees="0"
-    android:toDegrees="360">
-    <shape android:shape="ring" android:innerRadiusRatio="3"
-        android:thicknessRatio="8" android:useLevel="false">
+    android:duration="1"
+    android:toDegrees="1800">
+    <shape android:shape="ring" android:innerRadiusRatio="4"
+        android:thicknessRatio="10" android:useLevel="false">
 
         <size android:width="76dip" android:height="76dip" />
         <gradient android:type="sweep" android:useLevel="false"
-            android:startColor="#215"
+            android:startColor="#4286f4"
             android:endColor="#00ffffff"
             android:angle="0"
             />
