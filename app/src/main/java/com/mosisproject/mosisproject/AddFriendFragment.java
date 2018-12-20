@@ -45,7 +45,6 @@ import java.util.Set;
 
 public class AddFriendFragment extends Fragment {
 
-    //--
     private static final String TAG = AddFriendFragment.class.getSimpleName();
     private TextView status;
     private Button btnConnect;
@@ -73,8 +72,6 @@ public class AddFriendFragment extends Fragment {
     private ArrayAdapter<String> discoveredDevicesAdapter;
 
     boolean friendshipSuccess;
-    //--
-
 
     private OnFragmentInteractionListener mListener;
 
@@ -86,18 +83,18 @@ public class AddFriendFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        getActivity().setTitle(R.string.navigation_add_friend);
+
         View view = inflater.inflate(R.layout.fragment_add_friend, container, false);
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         //findViewsByIds(view);
-        //--
         status = (TextView) view.findViewById(R.id.status);
         btnConnect = (Button) view.findViewById(R.id.btn_connect);
         listView = (ListView) view.findViewById(R.id.list);
@@ -113,8 +110,6 @@ public class AddFriendFragment extends Fragment {
                 sendMessage(userId);
             }
         });
-
-        //--
 
         //check device support bluetooth
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -201,9 +196,6 @@ public class AddFriendFragment extends Fragment {
 
                                                     }
                                                 });
-
-
-
                                                 break;
 
                                             case DialogInterface.BUTTON_NEGATIVE:
@@ -220,7 +212,6 @@ public class AddFriendFragment extends Fragment {
                             else {
                                 Toast.makeText(getContext(), "You are already friends.", Toast.LENGTH_SHORT).show();
                             }
-
                         }
 
                         @Override
@@ -342,8 +333,6 @@ public class AddFriendFragment extends Fragment {
 
     }
 
-
-
     private void setStatus(String s) {
         status.setText(s);
     }
@@ -354,12 +343,9 @@ public class AddFriendFragment extends Fragment {
         chatController.connect(device);
     }
 
-
-
     private void sendMessage(String message) {
         if(chatController.getState() != BluetoothConnectionService.STATE_CONNECTED) {
             Toast.makeText( getContext(),"Connection was lost!", Toast.LENGTH_SHORT).show();
-
             return;
         }
 
@@ -376,22 +362,6 @@ public class AddFriendFragment extends Fragment {
         }
     }
 
-
-
-
-
-/*
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-    }
-*/
     @Override
     public void onDetach() {
         super.onDetach();
@@ -430,12 +400,16 @@ public class AddFriendFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (!bluetoothAdapter.isEnabled()) {
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BLUETOOTH);
-        }
-        else {
-            chatController = new BluetoothConnectionService(getContext(), handler);
+        try {
+            if (!bluetoothAdapter.isEnabled()) {
+                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableIntent, REQUEST_ENABLE_BLUETOOTH);
+            }
+            else {
+                chatController = new BluetoothConnectionService(getContext(), handler);
+            }
+        } catch (Exception e) {
+            Log.e("BLUETOOTH ERROR:", e.getMessage());
         }
     }
 

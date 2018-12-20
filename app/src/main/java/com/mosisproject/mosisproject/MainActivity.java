@@ -20,6 +20,8 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
@@ -73,6 +75,9 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         updateNavigationProfile(navigationView);
+
+        //Open default fragment
+        openFriendsFragment();
     }
 
     @Override
@@ -110,17 +115,12 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.friends_list) {
-            FriendsFragment friendsFragment = new FriendsFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, friendsFragment,"fragment_friends").commit();
-            String tag = friendsFragment.getTag();
-            Log.w("TAG:", tag);
-            //startBluetoothActivity();
+            openFriendsFragment();
+
         } else if (id == R.id.add_friend) {
             AddFriendFragment addFriendFragment = new AddFriendFragment();
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, addFriendFragment, "fragment_addFriend").commit();
-
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -141,10 +141,6 @@ public class MainActivity extends AppCompatActivity
         startActivity(new Intent(this, LoginActivity.class));
     }
 
-    public void startBluetoothActivity() {
-        startActivity(new Intent(this, BluetoothActivity.class));
-    }
-
     private void userLogout() {
         firebaseAuth.signOut();
         finish(); // Closing activity
@@ -162,6 +158,10 @@ public class MainActivity extends AppCompatActivity
         fullNameTextView.setText(user.getDisplayName());
         emailTextView.setText(user.getEmail());
 
+
+        // Update user photo
+        // Moze i ovako da se prikaze slika
+        /*
         //Update user photo
         File localFile = null;
         try {
@@ -186,5 +186,20 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+        */
+        //Ovako je lakse i jednostavnije
+        StorageReference sRef = storageReference.child("profile_images/" + user.getUid() + ".jpg");
+        GlideApp.with(getApplicationContext())
+                .load(sRef)
+                .transform(new CircleCrop())
+                .into(imageView);
+    }
+
+    private void openFriendsFragment() {
+        FriendsFragment friendsFragment = new FriendsFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, friendsFragment,"fragment_friends").commit();
+        String tag = friendsFragment.getTag();
+        Log.w("TAG:", tag);
     }
 }

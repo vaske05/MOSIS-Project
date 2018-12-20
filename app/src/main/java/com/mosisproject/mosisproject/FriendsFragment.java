@@ -27,6 +27,9 @@ import com.mosisproject.mosisproject.service.UserService;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Fragment for display friends list through FriendsAdapter
+ */
 public class FriendsFragment extends Fragment {
 
     Button buttonFindFriend;
@@ -39,7 +42,6 @@ public class FriendsFragment extends Fragment {
    // List<User> userList = new ArrayList<>();
     List<String> userIdList = new ArrayList<>();
     List<User> userList = new ArrayList<>();
-    UserService userService;
     ListView listViewFriends;
     private ArrayAdapter<String> adapter;
     private FriendsAdapter friendsAdapter;
@@ -49,30 +51,24 @@ public class FriendsFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-
+        getActivity().setTitle(R.string.navigation_friends);
 
         View view = inflater.inflate(R.layout.fragment_friends, container,false);
         buttonFindFriend = (Button) view.findViewById(R.id.buttonFindFriend);
         listViewFriends = (ListView) view.findViewById(R.id.friendList);
         spinner = (ProgressBar) view.findViewById(R.id.spinner);
 
-
-        userService = new UserService();
-        firebaseAuth = FirebaseAuth.getInstance();
-        firebaseUser = firebaseAuth.getCurrentUser();
-        userId = firebaseUser.getUid();
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
 
-        //adapter = new ArrayAdapter<String>(container.getContext(), android.R.layout.simple_expandable_list_item_1, userList);
-
+        userId = firebaseUser.getUid();
         friendsAdapter = new FriendsAdapter(container.getContext(), userList);
-
         listViewFriends.setAdapter(friendsAdapter);
         spinner.setVisibility(View.VISIBLE);
         getFriends(container);
-
 
         buttonFindFriend.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +102,6 @@ public class FriendsFragment extends Fragment {
                 for(int i = 0; i < userIdList.size(); i++) {
                     User friend = dataSnapshot.child("Users").child(userIdList.get(i)).getValue(User.class);
                     if (friend != null) {
-                        //userList.add(friend.getName() + " " + friend.getSurname() + "\n" + friend.getEmail());
                         userList.add(friend);
                     }
                 }
@@ -123,7 +118,4 @@ public class FriendsFragment extends Fragment {
             }
         });
     }
-
-    //TODO: Napravi Adapter klasu za novu friend list itema. Pogledaj: https://www.youtube.com/watch?v=q2XA0Pe2W04 , https://www.youtube.com/watch?v=ZEEYYvVwJGY
-
 }

@@ -26,4 +26,7 @@
 
     <string name="none_paired">No devices have been paired</string>
     <string name="none_found">No devices found</string>
+
+    <string name="navigation_friends">Friends</string>
+    <string name="navigation_add_friend">Add friend</string>
 </resources>

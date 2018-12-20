@@ -31,15 +31,20 @@
         android:layout_marginLeft="10dp"
         android:textSize="15dp"/>
 
-    <Button
-        android:id="@+id/friend_delete_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/friend_image"
-        android:layout_marginStart="80dp"
-        android:layout_marginBottom="3dp"
-        android:text="Delete"
-        android:layout_toEndOf="@id/friend_email"
-        android:textColor="@android:color/holo_red_dark" />
+    <RelativeLayout
+        android:gravity="right"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp">
+        <Button
+            android:id="@+id/friend_delete_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:text="Delete"
+            android:textColor="@android:color/holo_red_dark" />
+    </RelativeLayout>
+
 
 </RelativeLayout>
