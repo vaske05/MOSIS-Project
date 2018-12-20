@@ -21,17 +21,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-
-import java.io.File;
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -191,7 +185,7 @@ public class MainActivity extends AppCompatActivity
         StorageReference sRef = storageReference.child("profile_images/" + user.getUid() + ".jpg");
         GlideApp.with(getApplicationContext())
                 .load(sRef)
-                .transform(new CircleCrop())
+                .transform(new RoundedCorners(15))
                 .into(imageView);
     }
 

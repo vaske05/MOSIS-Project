@@ -22,7 +22,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mosisproject.mosisproject.model.User;
-import com.mosisproject.mosisproject.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,7 +64,7 @@ public class FriendsFragment extends Fragment {
         firebaseUser = firebaseAuth.getCurrentUser();
 
         userId = firebaseUser.getUid();
-        friendsAdapter = new FriendsAdapter(container.getContext(), userList);
+        friendsAdapter = new FriendsAdapter(container.getContext(), userList, getFragmentManager());
         listViewFriends.setAdapter(friendsAdapter);
         spinner.setVisibility(View.VISIBLE);
         getFriends(container);
@@ -105,7 +104,7 @@ public class FriendsFragment extends Fragment {
                         userList.add(friend);
                     }
                 }
-                friendsAdapter = new FriendsAdapter(container.getContext(), userList);
+                friendsAdapter = new FriendsAdapter(container.getContext(), userList, getFragmentManager());
                 listViewFriends.setAdapter(friendsAdapter);
                 friendsAdapter.notifyDataSetChanged();
                 spinner.setVisibility(View.GONE);
