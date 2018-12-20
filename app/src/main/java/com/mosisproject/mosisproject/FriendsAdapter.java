@@ -2,14 +2,22 @@ package com.mosisproject.mosisproject;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.bitmap.CircleCrop;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -25,6 +33,7 @@ public class FriendsAdapter extends ArrayAdapter<String> {
     List<String> emails = new ArrayList<>();
     List<String> names = new ArrayList<>();
     List<String> ids = new ArrayList<>();
+
 
     private FirebaseAuth firebaseAuth;
     private FirebaseStorage firebaseStorage;
@@ -59,7 +68,6 @@ public class FriendsAdapter extends ArrayAdapter<String> {
 
         ViewHolder mViewHolder = new ViewHolder();
 
-
         if(convertView == null) {
             LayoutInflater mInflater = (LayoutInflater) mContext.
                     getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -81,9 +89,9 @@ public class FriendsAdapter extends ArrayAdapter<String> {
 
         StorageReference sRef = storageReference.child("profile_images/" + ids.get(position) + ".jpg");
 
-
         GlideApp.with(mContext)
                 .load(sRef)
+                .transform(new CircleCrop())
                 .into(mViewHolder.mPhotos);
 
         return convertView;
