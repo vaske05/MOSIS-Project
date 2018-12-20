@@ -206,8 +206,10 @@ public class AddFriendFragment extends Fragment {
                                 };
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                builder.setMessage(connectingDevice.getName() + " wants to be a friend with you.").setPositiveButton("Yes", dialogClickListener)
-                                        .setNegativeButton("No", dialogClickListener).show();
+                                builder.setMessage(connectingDevice.getName() + " wants to be a friend with you.")
+                                        .setPositiveButton("Yes", dialogClickListener)
+                                        .setNegativeButton("No", dialogClickListener)
+                                        .show();
                             }
                             else {
                                 Toast.makeText(getContext(), "You are already friends.", Toast.LENGTH_SHORT).show();

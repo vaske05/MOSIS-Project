@@ -35,6 +35,9 @@ public class User {
         this.friendsList.add(friend);
     }
 
+    public void removeFriend(String friend) {
+        this.friendsList.remove(friend);
+    }
 
     public String getId() {
         return id;
