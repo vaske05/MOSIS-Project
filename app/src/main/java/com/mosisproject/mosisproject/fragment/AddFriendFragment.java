@@ -436,9 +436,8 @@ public class AddFriendFragment extends Fragment {
     }
 
     private final BroadcastReceiver discoveryFinishReceiver;
-
     {
-        discoveryFinishReceiver = new BroadcastReceiver() {
+        discoveryFinishReceiver = new BroadcastReceiver() { //TODO: Ovo mora da se sredi jer baguje!!!
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();

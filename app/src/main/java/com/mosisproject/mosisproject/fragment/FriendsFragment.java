@@ -21,7 +21,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.mosisproject.mosisproject.BluetoothActivity;
 import com.mosisproject.mosisproject.adapter.FriendsAdapter;
 import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.model.User;
@@ -72,20 +71,12 @@ public class FriendsFragment extends Fragment {
         spinner.setVisibility(View.VISIBLE);
         getFriends(container);
 
-        buttonFindFriend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startBluetoothActivity();
-            }
-        });
+
 
         return view;
     }
 
-    //Activity for finding new friend via bluetooth
-    private void startBluetoothActivity() {
-        startActivity(new Intent(getActivity(), BluetoothActivity.class));
-    }
+
 
     @Override
     public void onResume() {

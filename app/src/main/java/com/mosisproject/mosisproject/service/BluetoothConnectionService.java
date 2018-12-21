@@ -1,5 +1,4 @@
 package com.mosisproject.mosisproject.service;
-import com.mosisproject.mosisproject.BluetoothActivity;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,13 +9,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
+import com.mosisproject.mosisproject.R;
+import com.mosisproject.mosisproject.fragment.AddFriendFragment;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
 public class BluetoothConnectionService {
-    private static final String APP_NAME = "mosisApp";
+    private static final String APP_NAME = String.valueOf(R.string.app_name);
     private static final UUID MY_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 
     private final BluetoothAdapter bluetoothAdapter;
@@ -41,7 +43,7 @@ public class BluetoothConnectionService {
     // Set the current state of the chat connection
     private synchronized void setState(int state) {
         this.state = state;
-        handler.obtainMessage(BluetoothActivity.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        handler.obtainMessage(AddFriendFragment.MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
     }
 
     // get current connection state
@@ -116,9 +118,9 @@ public class BluetoothConnectionService {
         connectedThread.start();
 
         // Send the name of the connected device back to the UI Activity
-        Message msg = handler.obtainMessage(BluetoothActivity.MESSAGE_DEVICE_OBJECT);
+        Message msg = handler.obtainMessage(AddFriendFragment.MESSAGE_DEVICE_OBJECT);
         Bundle bundle = new Bundle();
-        bundle.putParcelable(BluetoothActivity.DEVICE_OBJECT, device);
+        bundle.putParcelable(AddFriendFragment.DEVICE_OBJECT, device);
         msg.setData(bundle);
         handler.sendMessage(msg);
 
@@ -155,7 +157,7 @@ public class BluetoothConnectionService {
     }
 
     private void connectionFailed() {
-        Message msg = handler.obtainMessage(BluetoothActivity.MESSAGE_TOAST);
+        Message msg = handler.obtainMessage(AddFriendFragment.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         bundle.putString("toast", "Unable to connect device");
         msg.setData(bundle);
@@ -166,7 +168,7 @@ public class BluetoothConnectionService {
     }
 
     private void connectionLost() {
-        Message msg = handler.obtainMessage(BluetoothActivity.MESSAGE_TOAST);
+        Message msg = handler.obtainMessage(AddFriendFragment.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
         bundle.putString("toast", "Device connection was lost");
         msg.setData(bundle);
@@ -325,7 +327,7 @@ public class BluetoothConnectionService {
                     bytes = inputStream.read(buffer);
 
                     // Send the obtained bytes to the UI Activity
-                    handler.obtainMessage(BluetoothActivity.MESSAGE_READ, bytes, -1,
+                    handler.obtainMessage(AddFriendFragment.MESSAGE_READ, bytes, -1,
                             buffer).sendToTarget();
                 } catch (IOException e) {
                     connectionLost();
@@ -340,7 +342,7 @@ public class BluetoothConnectionService {
         public void write(byte[] buffer) {
             try {
                 outputStream.write(buffer);
-                handler.obtainMessage(BluetoothActivity.MESSAGE_WRITE, -1, -1,
+                handler.obtainMessage(AddFriendFragment.MESSAGE_WRITE, -1, -1,
                         buffer).sendToTarget();
             } catch (IOException e) {
             }
