@@ -1,4 +1,4 @@
-package com.mosisproject.mosisproject;
+package com.mosisproject.mosisproject.adapter;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -24,6 +24,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mosisproject.mosisproject.module.GlideApp;
+import com.mosisproject.mosisproject.R;
+import com.mosisproject.mosisproject.fragment.FriendsFragment;
 import com.mosisproject.mosisproject.model.User;
 
 import java.util.ArrayList;

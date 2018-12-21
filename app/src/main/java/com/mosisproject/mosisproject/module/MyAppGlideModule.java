@@ -1,4 +1,4 @@
-package com.mosisproject.mosisproject;
+package com.mosisproject.mosisproject.module;
 
 import android.content.Context;
 

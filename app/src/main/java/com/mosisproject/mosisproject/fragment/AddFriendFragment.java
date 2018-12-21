@@ -1,4 +1,4 @@
-package com.mosisproject.mosisproject;
+package com.mosisproject.mosisproject.fragment;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,6 +35,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.model.User;
 import com.mosisproject.mosisproject.service.BluetoothConnectionService;
 
@@ -185,7 +186,7 @@ public class AddFriendFragment extends Fragment {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                         final User userSender = dataSnapshot.getValue(User.class);
-                                                        userSender.addFriend(user.getId()); //Add new friend
+                                                        userSender.addFriend(user.getId()); //Add new friend in User sender
                                                         databaseReference.setValue(userSender);
                                                         friendshipSuccess = true;
                                                         Toast.makeText(getContext(), "You became friend with. " + connectingDevice.getName(), Toast.LENGTH_SHORT).show();
@@ -434,29 +435,37 @@ public class AddFriendFragment extends Fragment {
         }
     }
 
-    private final BroadcastReceiver discoveryFinishReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
+    private final BroadcastReceiver discoveryFinishReceiver;
 
-            // discoveredDevicesAdapter.clear();
+    {
+        discoveryFinishReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
 
-            if(BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                Log.w("BLUETOOTH DEVICE: ", bluetoothDevice.getName());
-                if (bluetoothDevice.getBondState() != BluetoothDevice.BOND_BONDED) {
-                    if(discoveredDevicesAdapter.getCount()>0) {
-                        if (discoveredDevicesAdapter.getItem(0) == getString(R.string.none_found)) {
-                            discoveredDevicesAdapter.clear();
+                // discoveredDevicesAdapter.clear();
+
+                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                    BluetoothDevice bluetoothDevice = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    Log.w("BLUETOOTH DEVICE", bluetoothDevice.getName());
+                    Log.w("BOND STATE", String.valueOf(bluetoothDevice.getBondState()));
+                    if (bluetoothDevice.getBondState() != BluetoothDevice.BOND_BONDED) {
+                        if (discoveredDevicesAdapter.getCount() > 0) {
+                            if (discoveredDevicesAdapter.getItem(0) == getString(R.string.none_found)) {
+                                discoveredDevicesAdapter.clear();
+                            }
                         }
+                        discoveredDevicesAdapter.add(bluetoothDevice.getName() + "\n" + bluetoothDevice.getAddress());
                     }
-                    discoveredDevicesAdapter.add(bluetoothDevice.getName() + "\n" + bluetoothDevice.getAddress());
-                }
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                if(discoveredDevicesAdapter.getCount() == 0) {
-                    discoveredDevicesAdapter.add(getString(R.string.none_found));
+                    else if(bluetoothDevice.getBondState() == BluetoothDevice.BOND_BONDED) {
+                        discoveredDevicesAdapter.add(bluetoothDevice.getName() + "\n" + bluetoothDevice.getAddress());
+                    }
+                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                    if (discoveredDevicesAdapter.getCount() == 0) {
+                        discoveredDevicesAdapter.add(getString(R.string.none_found));
+                    }
                 }
             }
-        }
-    };
+        };
+    }
 }

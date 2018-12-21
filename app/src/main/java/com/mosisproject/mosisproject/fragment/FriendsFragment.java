@@ -1,4 +1,4 @@
-package com.mosisproject.mosisproject;
+package com.mosisproject.mosisproject.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +21,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mosisproject.mosisproject.BluetoothActivity;
+import com.mosisproject.mosisproject.adapter.FriendsAdapter;
+import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.model.User;
 
 import java.util.ArrayList;

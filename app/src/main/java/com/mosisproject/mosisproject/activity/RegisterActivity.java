@@ -1,4 +1,4 @@
-package com.mosisproject.mosisproject;
+package com.mosisproject.mosisproject.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -35,6 +35,7 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.model.User;
 import com.google.firebase.database.FirebaseDatabase;
 
