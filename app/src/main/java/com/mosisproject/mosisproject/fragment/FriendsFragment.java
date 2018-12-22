@@ -1,6 +1,5 @@
 package com.mosisproject.mosisproject.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,7 +20,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.mosisproject.mosisproject.BluetoothActivity;
 import com.mosisproject.mosisproject.adapter.FriendsAdapter;
 import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.model.User;
@@ -34,7 +32,6 @@ import java.util.List;
  */
 public class FriendsFragment extends Fragment {
 
-    Button buttonFindFriend;
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
     FirebaseDatabase firebaseDatabase;
@@ -56,7 +53,6 @@ public class FriendsFragment extends Fragment {
         getActivity().setTitle(R.string.navigation_friends);
 
         View view = inflater.inflate(R.layout.fragment_friends, container,false);
-        buttonFindFriend = (Button) view.findViewById(R.id.buttonFindFriend);
         listViewFriends = (ListView) view.findViewById(R.id.friendList);
         spinner = (ProgressBar) view.findViewById(R.id.spinner);
 
@@ -72,19 +68,7 @@ public class FriendsFragment extends Fragment {
         spinner.setVisibility(View.VISIBLE);
         getFriends(container);
 
-        buttonFindFriend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startBluetoothActivity();
-            }
-        });
-
         return view;
-    }
-
-    //Activity for finding new friend via bluetooth
-    private void startBluetoothActivity() {
-        startActivity(new Intent(getActivity(), BluetoothActivity.class));
     }
 
     @Override
