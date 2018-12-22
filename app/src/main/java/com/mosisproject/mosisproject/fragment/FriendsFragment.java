@@ -71,8 +71,6 @@ public class FriendsFragment extends Fragment {
         return view;
     }
 
-
-
     @Override
     public void onResume() {
         super.onResume();
