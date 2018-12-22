@@ -31,16 +31,6 @@
             android:indeterminateDrawable="@drawable/progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"></ProgressBar>
-
-
-
-
-        <Button
-            android:id="@+id/buttonFindFriend"
-            android:layout_width="145dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal|center"
-            android:text="Find friend" />
     </LinearLayout>
 
 

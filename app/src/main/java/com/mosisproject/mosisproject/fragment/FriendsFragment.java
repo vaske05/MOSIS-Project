@@ -1,6 +1,5 @@
 package com.mosisproject.mosisproject.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -33,7 +32,6 @@ import java.util.List;
  */
 public class FriendsFragment extends Fragment {
 
-    Button buttonFindFriend;
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
     FirebaseDatabase firebaseDatabase;
@@ -55,7 +53,6 @@ public class FriendsFragment extends Fragment {
         getActivity().setTitle(R.string.navigation_friends);
 
         View view = inflater.inflate(R.layout.fragment_friends, container,false);
-        buttonFindFriend = (Button) view.findViewById(R.id.buttonFindFriend);
         listViewFriends = (ListView) view.findViewById(R.id.friendList);
         spinner = (ProgressBar) view.findViewById(R.id.spinner);
 
@@ -70,8 +67,6 @@ public class FriendsFragment extends Fragment {
         listViewFriends.setAdapter(friendsAdapter);
         spinner.setVisibility(View.VISIBLE);
         getFriends(container);
-
-
 
         return view;
     }
