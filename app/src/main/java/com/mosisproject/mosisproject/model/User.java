@@ -9,17 +9,19 @@ public class User {
     public String surname;
     public String phone;
     public String email;
+    public String points;
     public List<String> friendsList;
 
     public User() {
     }
 
-    public User(String id, String name, String surname, String email, String phone, List<String> friends) {
+    public User(String id, String name, String surname, String email, String phone, String points, List<String> friends) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.phone = phone;
         this.email = email;
+        this.points = points;
         this.friendsList = friends;
     }
 
@@ -77,5 +79,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPoints() {
+        return points;
+    }
+
+    public void setPoints(String points) {
+        this.points = points;
     }
 }

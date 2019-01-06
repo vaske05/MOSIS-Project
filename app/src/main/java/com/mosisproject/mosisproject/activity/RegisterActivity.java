@@ -145,7 +145,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                             //Store user
                             List<String> friends= new ArrayList<>();
                             friends.add("init");
-                            storeUser(name, surname, email, phone, friends);
+                            storeUser(name, surname, email, phone,"0", friends);
                             //Store profile image
                             storeImage();
                             //saveImage();
@@ -180,9 +180,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 });
     }
 
-    private void storeUser(String name, String surname, String email, String phone, List<String > friends) {
-        String userId = firebaseAuth.getUid();
-        User user = new User(userId, name, surname, email, phone, friends);
+    private void storeUser(String name, String surname, String email, String phone,String points, List<String > friends) { //TODO: URADII da vraca true ili false
+        String userId = firebaseAuth.getCurrentUser().getUid();
+        User user = new User(userId, name, surname, email, phone, points, friends);
         database.getReference("Users")
                 .child(firebaseAuth.getCurrentUser().getUid())
                 .setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {

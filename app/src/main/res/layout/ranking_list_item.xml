@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/ranker_image"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:src="@mipmap/ic_launcher"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Full Name"
+        android:id="@+id/ranker_full_name"
+        android:layout_toEndOf="@id/ranker_image"
+        android:layout_toRightOf="@id/ranker_image"
+        android:layout_marginLeft="5dp"
+        android:textSize="20dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="example@gmail.com"
+        android:id="@+id/ranker_email"
+        android:layout_toEndOf="@id/ranker_image"
+        android:layout_toRightOf="@id/ranker_image"
+        android:layout_below="@id/ranker_full_name"
+        android:layout_marginLeft="10dp"
+        android:textSize="15dp"/>
+
+    <RelativeLayout
+        android:gravity="right"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="40dp"
+
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="1dp"
+            android:layout_marginRight="1dp"
+            android:layout_toStartOf="@id/ranking_points"
+            android:layout_toLeftOf="@id/ranking_points"
+            android:src="@drawable/ic_star_black_24dp" />
+
+        <TextView
+            android:id="@+id/ranking_points"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:text="0"
+            android:textSize="30dp"
+            android:textColor="@color/colorPrimary" />
+    </RelativeLayout>
+
+
+</RelativeLayout>

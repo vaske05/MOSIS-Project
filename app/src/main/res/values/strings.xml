@@ -29,4 +29,6 @@
 
     <string name="navigation_friends">Friends</string>
     <string name="navigation_add_friend">Add friend</string>
+    <string name="navigation_rankings">Rankings</string>
+
 </resources>
