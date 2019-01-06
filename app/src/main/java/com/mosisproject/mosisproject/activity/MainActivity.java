@@ -23,6 +23,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mosisproject.mosisproject.fragment.RankingsFragment;
 import com.mosisproject.mosisproject.module.GlideApp;
 import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.fragment.AddFriendFragment;
@@ -113,11 +114,10 @@ public class MainActivity extends AppCompatActivity
             openFriendsFragment();
 
         } else if (id == R.id.add_friend) {
-            AddFriendFragment addFriendFragment = new AddFriendFragment();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, addFriendFragment, "fragment_addFriend").commit();
+            openAddFriendFragment();
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.ranking) {
+            openRankingsFragment();
 
         } else if (id == R.id.nav_manage) {
 
@@ -196,5 +196,17 @@ public class MainActivity extends AppCompatActivity
                 .replace(R.id.fragment_container, friendsFragment,"fragment_friends").commit();
         String tag = friendsFragment.getTag();
         Log.w("TAG:", tag);
+    }
+
+    private void openAddFriendFragment() {
+        AddFriendFragment addFriendFragment = new AddFriendFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, addFriendFragment, "fragment_addFriend").commit();
+    }
+
+    private void openRankingsFragment() {
+        RankingsFragment rankingsFragment = new RankingsFragment();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, rankingsFragment, "fragment_rankings").commit();
     }
 }
