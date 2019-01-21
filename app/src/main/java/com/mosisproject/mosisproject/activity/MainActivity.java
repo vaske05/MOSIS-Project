@@ -2,8 +2,10 @@ package com.mosisproject.mosisproject.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -23,19 +25,38 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mapbox.android.core.permissions.PermissionsListener;
+import com.mapbox.android.core.permissions.PermissionsManager;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.location.LocationComponent;
+import com.mapbox.mapboxsdk.location.modes.CameraMode;
+import com.mapbox.mapboxsdk.location.modes.RenderMode;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
+import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mosisproject.mosisproject.fragment.RankingsFragment;
 import com.mosisproject.mosisproject.module.GlideApp;
 import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.fragment.AddFriendFragment;
 import com.mosisproject.mosisproject.fragment.FriendsFragment;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, PermissionsListener {
 
     private FirebaseAuth firebaseAuth;
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
     private FirebaseUser user;
+    private SupportMapFragment mapFragment;
+    private MapboxMap mapboxMap;
+    private PermissionsManager permissionsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +68,31 @@ public class MainActivity extends AppCompatActivity
         storageReference = firebaseStorage.getReference();
         user = firebaseAuth.getCurrentUser();
 
+        Mapbox.getInstance(this, "pk.eyJ1IjoibjNtYW5qNCIsImEiOiJjanF0dGRnbHgwZGMwNDdyeDJ1aGMwN2VmIn0.vpt5O-HzHp-iP42KQW70Lg");
 
+        if (savedInstanceState == null) {
+
+            // Create fragment
+            final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+
+            LatLng patagonia = new LatLng(-52.6885, -70.1395);
+
+            // Build mapboxMap
+            MapboxMapOptions options = new MapboxMapOptions();
+            options.camera(new CameraPosition.Builder()
+                    .target(patagonia)
+                    .zoom(9)
+                    .build());
+
+            // Create map fragment
+            mapFragment = SupportMapFragment.newInstance(options);
+
+            // Add map fragment to parent container
+            transaction.add(R.id.fragment_container, mapFragment, "com.mapbox.map");
+            transaction.commit();
+        } else {
+            mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentByTag("com.mapbox.map");
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -109,7 +154,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-
         if (id == R.id.friends_list) {
             openFriendsFragment();
 
@@ -120,7 +164,7 @@ public class MainActivity extends AppCompatActivity
             openRankingsFragment();
 
         } else if (id == R.id.nav_manage) {
-
+            openMapFragment();
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_logout) {
@@ -131,6 +175,9 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+
 
     public void startLoginActivity() {
         startActivity(new Intent(this, LoginActivity.class));
@@ -209,4 +256,121 @@ public class MainActivity extends AppCompatActivity
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, rankingsFragment, "fragment_rankings").commit();
     }
+
+    private void openMapFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, mapFragment, "com.mapbox.map").commit();
+
+        mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    @SuppressWarnings({"MissingPermission"})
+    public void onStart() {
+        super.onStart();
+        mapFragment.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapFragment.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapFragment.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapFragment.onStop();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapFragment.onLowMemory();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mapFragment.onDestroy();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapFragment.onSaveInstanceState(outState);
+    }
+
+    @Override
+
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Toast.makeText(this, "Odobri mape konju", Toast.LENGTH_LONG).show();
+    }
+    @Override
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            enableLocationComponent();
+        } else {
+            Toast.makeText(this, "Kuj te jebe", Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+
+    @Override
+    public void onMapReady(@NonNull MapboxMap _mapboxMap) {
+        MainActivity.this.mapboxMap = _mapboxMap;
+        mapboxMap.addOnMapClickListener(new MapboxMap.OnMapClickListener() {
+            @Override
+            public boolean onMapClick(@NonNull LatLng point) {
+
+                mapboxMap.addMarker(new MarkerOptions().position(point).title(point.toString()));
+
+                return true;
+            }
+        });
+
+        mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
+            @Override
+            public void onStyleLoaded(@NonNull Style style) {
+                enableLocationComponent();
+            }
+        });
+    }
+        @SuppressWarnings( {"MissingPermission"})
+        private void enableLocationComponent() {
+            // Check if permissions are enabled and if not request
+            if (PermissionsManager.areLocationPermissionsGranted(this)) {
+
+                // Get an instance of the component
+                LocationComponent locationComponent = mapboxMap.getLocationComponent();
+
+                // Activate
+                locationComponent.activateLocationComponent(this, mapboxMap.getStyle());
+
+                // Enable to make component visible
+                locationComponent.setLocationComponentEnabled(true);
+
+                // Set the component's camera mode
+                locationComponent.setCameraMode(CameraMode.TRACKING);
+
+                // Set the component's render mode
+                locationComponent.setRenderMode(RenderMode.COMPASS);
+
+            } else {
+                permissionsManager = new PermissionsManager(this);
+                permissionsManager.requestLocationPermissions(this);
+            }
+        }
 }
