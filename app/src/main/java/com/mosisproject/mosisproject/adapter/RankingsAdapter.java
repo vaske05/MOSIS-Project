@@ -54,10 +54,14 @@ public class RankingsAdapter extends ArrayAdapter {
         }
     }
 
+    @Override
+    public int getCount() {
+        return rankingList.size();
+    }
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         ViewHolder mViewHolder = new ViewHolder();
         if(convertView == null) {

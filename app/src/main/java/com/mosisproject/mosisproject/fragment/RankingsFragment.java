@@ -23,6 +23,9 @@ import com.mosisproject.mosisproject.adapter.RankingsAdapter;
 import com.mosisproject.mosisproject.model.User;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -47,9 +50,11 @@ public class RankingsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_rankings, container, false);
         getActivity().setTitle(R.string.navigation_rankings);
-        listViewRankings = view.findViewById(R.id.rankingList);
+
+        View view = inflater.inflate(R.layout.fragment_rankings, container, false);
+
+        listViewRankings = (ListView) view.findViewById(R.id.rankingList);
         spinner = view.findViewById(R.id.spinner);
 
         firebaseDatabase = FirebaseDatabase.getInstance();
@@ -63,7 +68,7 @@ public class RankingsFragment extends Fragment {
         spinner.setVisibility(View.VISIBLE);
         loadRankings(container);
 
-        return  view;
+        return view;
     }
 
     private void loadRankings(final ViewGroup container) {
@@ -80,6 +85,8 @@ public class RankingsFragment extends Fragment {
                         userList.add(friend);
                     }
                 }
+                userList = bubbleSort(userList); //Sorting list in descending order
+
                 rankingsAdapter = new RankingsAdapter(container.getContext(), userList);
                 listViewRankings.setAdapter(rankingsAdapter);
                 rankingsAdapter.notifyDataSetChanged();
@@ -90,6 +97,20 @@ public class RankingsFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.e("GET USER ID LIST ERROR:", databaseError.getMessage());
                 spinner.setVisibility(View.GONE);
+            }
+
+            private List<User> bubbleSort(@NonNull List<User> userList) {
+                int size = userList.size();
+                for(int i = 0; i < size-1; i++) {
+                    for (int j = 0; j < size-1-i; j++) {
+                        if(Integer.parseInt( userList.get(j).getPoints()) < Integer.parseInt( userList.get(j+1).getPoints())) {
+                            User tempUser = userList.get(j);
+                            userList.set(j, userList.get(j+1));
+                            userList.set(j+1, tempUser);
+                        }
+                    }
+                }
+                return userList;
             }
         });
     }
