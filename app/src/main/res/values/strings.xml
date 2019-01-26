@@ -3,6 +3,11 @@
     <string name="title_activity_login">Log in</string>
     <string name="title_activity_registration">Registration</string>
     <string name="access_token">pk.eyJ1IjoibjNtYW5qNCIsImEiOiJjanF0dGRnbHgwZGMwNDdyeDJ1aGMwN2VmIn0.vpt5O-HzHp-iP42KQW70Lg</string>
+    <!-- Location service -->
+    <string name="tracking_enabled_notif">Tracking is currently enabled. Tap to cancel.</string>
+    <string name="test_email">n@gmail.com</string>
+    <string name="test_password">12344321</string>
+    <string name="firebase_path">location</string>
     <!-- Strings related to login -->
     <string name="name_in_icon_launcher">mosisApp</string>
     <string name="prompt_email">Email</string>

@@ -1,11 +1,13 @@
 package com.mosisproject.mosisproject.activity;
 
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -44,11 +46,14 @@ import com.mosisproject.mosisproject.module.GlideApp;
 import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.fragment.AddFriendFragment;
 import com.mosisproject.mosisproject.fragment.FriendsFragment;
+import com.mosisproject.mosisproject.service.TrackingService;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, PermissionsListener {
+
+    private static final int PERMISSIONS_REQUEST = 100;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseStorage firebaseStorage;
@@ -117,10 +122,24 @@ public class MainActivity extends AppCompatActivity
 
         updateNavigationProfile(navigationView);
 
+        InitLocationService();
         //Open default fragment
         openFriendsFragment();
     }
 
+    private void InitLocationService() {
+        //Check whether GPS tracking is enabled//
+
+        LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            finish();
+        }
+
+//If the location permission has been granted, then start the TrackerService//
+
+        startTrackerService();
+
+    }
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -175,9 +194,6 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-
-
 
     public void startLoginActivity() {
         startActivity(new Intent(this, LoginActivity.class));
@@ -310,7 +326,7 @@ public class MainActivity extends AppCompatActivity
     @Override
 
     public void onExplanationNeeded(List<String> permissionsToExplain) {
-        Toast.makeText(this, "Odobri mape konju", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "Enable permissions", Toast.LENGTH_LONG).show();
     }
     @Override
 
@@ -322,12 +338,23 @@ public class MainActivity extends AppCompatActivity
     public void onPermissionResult(boolean granted) {
         if (granted) {
             enableLocationComponent();
+            startTrackerService();
         } else {
-            Toast.makeText(this, "Kuj te jebe", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "Permissions not granted", Toast.LENGTH_LONG).show();
             finish();
         }
     }
+    private void startTrackerService() {
+        startService(new Intent(this, TrackingService.class));
 
+//Notify the user that tracking has been enabled//
+
+        Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
+
+//Close MainActivity//
+
+        //finish();
+    }
     @Override
     public void onMapReady(@NonNull MapboxMap _mapboxMap) {
         MainActivity.this.mapboxMap = _mapboxMap;
