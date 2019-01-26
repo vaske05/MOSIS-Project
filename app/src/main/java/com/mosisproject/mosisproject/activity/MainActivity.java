@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity
         storageReference = firebaseStorage.getReference();
         user = firebaseAuth.getCurrentUser();
 
-        Mapbox.getInstance(this, "pk.eyJ1IjoibjNtYW5qNCIsImEiOiJjanF0dGRnbHgwZGMwNDdyeDJ1aGMwN2VmIn0.vpt5O-HzHp-iP42KQW70Lg");
+        Mapbox.getInstance(this, getString(R.string.access_token));
 
         if (savedInstanceState == null) {
 
