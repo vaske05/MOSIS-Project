@@ -247,7 +247,7 @@ public class AddFriendFragment extends Fragment {
      * @param readMessage friend id
      * @return true if user have this friend in friendList
      */
-    private boolean checkFriendship(User user,String readMessage ) {//TODO: PROVERI OVO
+    private boolean checkFriendship(User user,String readMessage ) {
         List<String> friendList = user.getFriendsList();
         for(int i = 0; i < friendList.size(); i++) {
             if(friendList.get(i).equals(readMessage)) {
