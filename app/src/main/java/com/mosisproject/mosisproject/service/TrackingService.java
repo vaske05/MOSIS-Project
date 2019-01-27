@@ -16,11 +16,15 @@ import com.mosisproject.mosisproject.model.User;
 import com.mosisproject.mosisproject.model.UserLocation;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.ContextCompat;
 import android.os.IBinder;
 import android.content.Intent;
@@ -36,7 +40,9 @@ public class TrackingService extends Service {
     private DatabaseReference databaseReference;
     private LocationCallback locationCallback;
     private LocationRequest request;
-    private FusedLocationProviderClient LocationClient;
+    private FusedLocationProviderClient locationClient;
+    private NotificationManager notificationManager;
+    public static final String NOTIFICATION_CHANNEL_ID = "10001";
 
     private static final String TAG = TrackingService.class.getSimpleName();
 
@@ -48,7 +54,7 @@ public class TrackingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        //buildNotification();
+        buildNotification();
         requestLocationUpdates();
         Log.i(TAG, "Service onCreate");
     }
@@ -56,7 +62,8 @@ public class TrackingService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        LocationClient.removeLocationUpdates(locationCallback);
+        locationClient.removeLocationUpdates(locationCallback);
+        unregisterReceiver(stopReceiver);
         Log.i(TAG, "Service onDestroyed");
     }
 
@@ -70,14 +77,27 @@ public class TrackingService extends Service {
         Notification.Builder builder = new Notification.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.tracking_enabled_notif))
-
-//Make this notification ongoing so it can’t be dismissed by the user//
-
-                .setOngoing(true)
+                .setAutoCancel(true)
                 .setContentIntent(broadcastIntent)
                 .setSmallIcon(R.drawable.tracking_enabled);
-        startForeground(1, builder.build());
+        notificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            int importance = NotificationManager.IMPORTANCE_HIGH;
+            NotificationChannel notificationChannel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "User tracking", importance);
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            //notificationChannel.enableVibration(true);
+            //notificationChannel.setVibrationPattern(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400});
+            assert notificationManager != null;
+            builder.setChannelId(NOTIFICATION_CHANNEL_ID);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+        assert notificationManager != null;
+        notificationManager.notify(0 /* Request Code */,builder.build());
     }
+
 
     protected BroadcastReceiver stopReceiver = new BroadcastReceiver() {
         @Override
@@ -101,11 +121,11 @@ public class TrackingService extends Service {
         request = new LocationRequest();
 
 //Specify how often your app should request the device’s location//
-        request.setInterval(3000);
+        request.setInterval(10000);
 
 //Get the most accurate location data available//
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        LocationClient = LocationServices.getFusedLocationProviderClient(this);
+        locationClient = LocationServices.getFusedLocationProviderClient(this);
 
         int permission = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
@@ -113,7 +133,7 @@ public class TrackingService extends Service {
 //If the app currently has access to the location permission...//
         if (permission == PackageManager.PERMISSION_GRANTED) {
 //...then request location updates//
-            LocationClient.requestLocationUpdates(request,locationCallback = new LocationCallback() {
+            locationClient.requestLocationUpdates(request,locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
 
