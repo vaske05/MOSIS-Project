@@ -6,13 +6,11 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -21,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -79,12 +78,10 @@ public class MainActivity extends AppCompatActivity
         Mapbox.getInstance(this, getString(R.string.access_token));
 
         if (savedInstanceState == null) {
-
             // Create fragment
             final FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
             LatLng patagonia = new LatLng(-52.6885, -70.1395);
-
             // Build mapboxMap
             MapboxMapOptions options = new MapboxMapOptions();
             options.camera(new CameraPosition.Builder()
@@ -105,15 +102,6 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -125,7 +113,22 @@ public class MainActivity extends AppCompatActivity
 
         updateNavigationProfile(navigationView);
 
+        //Tracking switch listener
+        SwitchCompat drawerSwitch = (SwitchCompat) navigationView.getMenu().findItem(R.id.nav_tracking)
+                .getActionView().findViewById(R.id.drawer_switch);
+        drawerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    startTrackerService();
+                } else {
+                    stopTrackingService();
+                }
+            }
+        });
+
         InitLocationService();
+        drawerSwitch.setChecked(true);
         //Open default fragment
         openFriendsFragment();
     }
@@ -138,7 +141,7 @@ public class MainActivity extends AppCompatActivity
             finish();
         }
 
-int permission = ContextCompat.checkSelfPermission(this,
+        int permission = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
 
 //If the location permission has been granted, then start the TrackerService//
@@ -199,9 +202,7 @@ int permission = ContextCompat.checkSelfPermission(this,
 
         } else if (id == R.id.nav_manage) {
             openMapFragment();
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_logout) {
+        }  else if (id == R.id.nav_logout) {
             userLogout();
         }
 
@@ -361,11 +362,16 @@ int permission = ContextCompat.checkSelfPermission(this,
     }
     private void startTrackerService() {
         startService(new Intent(this, TrackingService.class));
-
-//Notify the user that tracking has been enabled//
-
+        //Notify the user that tracking has been enabled//
         Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
     }
+
+    private void stopTrackingService() {
+        stopService(new Intent(this, TrackingService.class));
+        Toast.makeText(this, "GPS tracking disabled", Toast.LENGTH_SHORT).show();
+
+    }
+
     @Override
     public void onMapReady(@NonNull MapboxMap _mapboxMap) {
         MainActivity.this.mapboxMap = _mapboxMap;

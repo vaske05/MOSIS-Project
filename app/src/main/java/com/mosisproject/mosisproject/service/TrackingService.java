@@ -63,7 +63,7 @@ public class TrackingService extends Service {
     public void onDestroy() {
         super.onDestroy();
         locationClient.removeLocationUpdates(locationCallback);
-        unregisterReceiver(stopReceiver);
+        //unregisterReceiver(stopReceiver);
         Log.i(TAG, "Service onDestroyed");
     }
 
@@ -73,7 +73,7 @@ public class TrackingService extends Service {
         PendingIntent broadcastIntent = PendingIntent.getBroadcast(
                 this, 0, new Intent(stop), PendingIntent.FLAG_UPDATE_CURRENT);
 
-// Create the persistent notification//
+        // Create the persistent notification//
         Notification.Builder builder = new Notification.Builder(this)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.tracking_enabled_notif))
@@ -98,47 +98,38 @@ public class TrackingService extends Service {
         notificationManager.notify(0 /* Request Code */,builder.build());
     }
 
-
     protected BroadcastReceiver stopReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
-//Unregister the BroadcastReceiver when the notification is tapped//
-
+            //Unregister the BroadcastReceiver when the notification is tapped//
             unregisterReceiver(stopReceiver);
-
-//Stop the Service//
-
+            //Stop the Service//
             stopSelf();
         }
     };
 
-
-
     //Initiate the request to track the device's location//
-
     private void requestLocationUpdates() {
         request = new LocationRequest();
 
-//Specify how often your app should request the device’s location//
+        //Specify how often your app should request the device’s location//
         request.setInterval(10000);
 
-//Get the most accurate location data available//
+        //Get the most accurate location data available//
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationClient = LocationServices.getFusedLocationProviderClient(this);
 
         int permission = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
 
-//If the app currently has access to the location permission...//
+        //If the app currently has access to the location permission...//
         if (permission == PackageManager.PERMISSION_GRANTED) {
-//...then request location updates//
+        //...then request location updates//
             locationClient.requestLocationUpdates(request,locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
 
-//Get a reference to the database, so your app can perform read and write operations//
-
+                    //Get a reference to the database, so your app can perform read and write operations
                     databaseReference = FirebaseDatabase.getInstance().getReference("Users").child(FirebaseAuth.getInstance().getUid());
                     final Location location = locationResult.getLastLocation();
                     if (location != null) {
