@@ -1,11 +1,18 @@
 package com.mosisproject.mosisproject.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -58,7 +65,6 @@ public class MainActivity extends AppCompatActivity
     private SupportMapFragment mapFragment;
     private MapboxMap mapboxMap;
     private PermissionsManager permissionsManager;
-    MapboxMapOptions options;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +86,7 @@ public class MainActivity extends AppCompatActivity
             LatLng patagonia = new LatLng(-52.6885, -70.1395);
 
             // Build mapboxMap
-            options = new MapboxMapOptions();
+            MapboxMapOptions options = new MapboxMapOptions();
             options.camera(new CameraPosition.Builder()
                     .target(patagonia)
                     .zoom(9)
@@ -98,6 +104,15 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });*/
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -117,13 +132,27 @@ public class MainActivity extends AppCompatActivity
 
     private void InitLocationService() {
         //Check whether GPS tracking is enabled//
+
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             finish();
         }
 
-        //If the location permission has been granted, then start the TrackerService//
-        startTrackerService();
+int permission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+
+//If the location permission has been granted, then start the TrackerService//
+
+        if (permission == PackageManager.PERMISSION_GRANTED) {
+            startTrackerService();
+        } else {
+
+//If the app doesn’t currently have access to the user’s location, then request access//
+
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST);
+        }
 
     }
     @Override
@@ -260,94 +289,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void openMapFragment() {
-        mapFragment = SupportMapFragment.newInstance(options);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, mapFragment, "com.mapbox.map").commit();
+
         mapFragment.getMapAsync(this);
     }
-
-
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapFragment.onSaveInstanceState(outState);
-    }
-
-    @Override
-
-    public void onExplanationNeeded(List<String> permissionsToExplain) {
-        Toast.makeText(this, "Enable permissions", Toast.LENGTH_LONG).show();
-    }
-    @Override
-
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    @Override
-    public void onPermissionResult(boolean granted) {
-        if (granted) {
-            enableLocationComponent();
-            startTrackerService();
-        } else {
-            Toast.makeText(this, "Permissions not granted", Toast.LENGTH_LONG).show();
-            finish();
-        }
-    }
-    private void startTrackerService() {
-        startService(new Intent(this, TrackingService.class));
-        //Notify the user that tracking has been enabled//
-        Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
-
-
-    }
-    @Override
-    public void onMapReady(@NonNull MapboxMap _mapboxMap) {
-        MainActivity.this.mapboxMap = _mapboxMap;
-        mapboxMap.addOnMapClickListener(new MapboxMap.OnMapClickListener() {
-            @Override
-            public boolean onMapClick(@NonNull LatLng point) {
-                mapboxMap.addMarker(new MarkerOptions().position(point).title(point.toString()));
-                return true;
-            }
-        });
-
-        mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
-            @Override
-            public void onStyleLoaded(@NonNull Style style) {
-                enableLocationComponent();
-            }
-        });
-    }
-
-    @SuppressWarnings( {"MissingPermission"})
-    private void enableLocationComponent() {
-        // Check if permissions are enabled and if not request
-        if (PermissionsManager.areLocationPermissionsGranted(this)) {
-
-            // Get an instance of the component
-            LocationComponent locationComponent = mapboxMap.getLocationComponent();
-
-            // Activate
-            locationComponent.activateLocationComponent(this, mapboxMap.getStyle());
-
-            // Enable to make component visible
-            locationComponent.setLocationComponentEnabled(true);
-
-            // Set the component's camera mode
-            locationComponent.setCameraMode(CameraMode.TRACKING);
-
-            // Set the component's render mode
-            locationComponent.setRenderMode(RenderMode.COMPASS);
-
-        } else {
-            permissionsManager = new PermissionsManager(this);
-            permissionsManager.requestLocationPermissions(this);
-        }
-    }
-
-
 
     @Override
     @SuppressWarnings({"MissingPermission"})
@@ -386,5 +332,83 @@ public class MainActivity extends AppCompatActivity
         mapFragment.onDestroy();
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapFragment.onSaveInstanceState(outState);
+    }
 
+    @Override
+
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Toast.makeText(this, "Enable permissions", Toast.LENGTH_LONG).show();
+    }
+    @Override
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+    }
+
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            enableLocationComponent();
+            startTrackerService();
+        } else {
+            Toast.makeText(this, "Permissions not granted", Toast.LENGTH_LONG).show();
+            finish();
+        }
+    }
+    private void startTrackerService() {
+        startService(new Intent(this, TrackingService.class));
+
+//Notify the user that tracking has been enabled//
+
+        Toast.makeText(this, "GPS tracking enabled", Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    public void onMapReady(@NonNull MapboxMap _mapboxMap) {
+        MainActivity.this.mapboxMap = _mapboxMap;
+        mapboxMap.addOnMapClickListener(new MapboxMap.OnMapClickListener() {
+            @Override
+            public boolean onMapClick(@NonNull LatLng point) {
+
+                mapboxMap.addMarker(new MarkerOptions().position(point).title(point.toString()));
+
+                return true;
+            }
+        });
+
+        mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
+            @Override
+            public void onStyleLoaded(@NonNull Style style) {
+                enableLocationComponent();
+            }
+        });
+    }
+        @SuppressWarnings( {"MissingPermission"})
+        private void enableLocationComponent() {
+            // Check if permissions are enabled and if not request
+            if (PermissionsManager.areLocationPermissionsGranted(this)) {
+
+                // Get an instance of the component
+                LocationComponent locationComponent = mapboxMap.getLocationComponent();
+
+                // Activate
+                locationComponent.activateLocationComponent(this, mapboxMap.getStyle());
+
+                // Enable to make component visible
+                locationComponent.setLocationComponentEnabled(true);
+
+                // Set the component's camera mode
+                locationComponent.setCameraMode(CameraMode.TRACKING);
+
+                // Set the component's render mode
+                locationComponent.setRenderMode(RenderMode.COMPASS);
+
+            } else {
+                permissionsManager = new PermissionsManager(this);
+                permissionsManager.requestLocationPermissions(this);
+            }
+        }
 }
