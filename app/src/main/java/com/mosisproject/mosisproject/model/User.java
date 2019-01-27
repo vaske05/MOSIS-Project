@@ -11,6 +11,7 @@ public class User {
     public String email;
     public String points;
     public List<String> friendsList;
+    public UserLocation userLocation;
 
     public User() {
     }
@@ -87,5 +88,13 @@ public class User {
 
     public void setPoints(String points) {
         this.points = points;
+    }
+
+    public UserLocation getUserLocation() {
+        return userLocation;
+    }
+
+    public void setUserLocation(UserLocation userLocation) {
+        this.userLocation = userLocation;
     }
 }
