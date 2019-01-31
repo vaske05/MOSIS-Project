@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity
     private SupportMapFragment mapFragment;
     private MapboxMap mapboxMap;
     private PermissionsManager permissionsManager;
+    private MapboxMapOptions options;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +84,7 @@ public class MainActivity extends AppCompatActivity
 
             LatLng patagonia = new LatLng(-52.6885, -70.1395);
             // Build mapboxMap
-            MapboxMapOptions options = new MapboxMapOptions();
+            options = new MapboxMapOptions();
             options.camera(new CameraPosition.Builder()
                     .target(patagonia)
                     .zoom(9)
@@ -144,19 +145,16 @@ public class MainActivity extends AppCompatActivity
         int permission = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
 
-//If the location permission has been granted, then start the TrackerService//
-
+        //If the location permission has been granted, then start the TrackerService//
         if (permission == PackageManager.PERMISSION_GRANTED) {
             startTrackerService();
         } else {
 
-//If the app doesn’t currently have access to the user’s location, then request access//
-
+        //If the app doesn’t currently have access to the user’s location, then request access//
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST);
         }
-
     }
     @Override
     public void onBackPressed() {
@@ -232,7 +230,6 @@ public class MainActivity extends AppCompatActivity
         fullNameTextView.setText(user.getDisplayName());
         emailTextView.setText(user.getEmail());
 
-
         // Update user photo
         // Moze i ovako da se prikaze slika
         /*
@@ -290,6 +287,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void openMapFragment() {
+        mapFragment = SupportMapFragment.newInstance(options);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, mapFragment, "com.mapbox.map").commit();
 
