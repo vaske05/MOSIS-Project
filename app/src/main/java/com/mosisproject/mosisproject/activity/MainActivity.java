@@ -6,7 +6,10 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SwitchCompat;
@@ -19,6 +22,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -65,6 +69,7 @@ public class MainActivity extends AppCompatActivity
     private MapboxMap mapboxMap;
     private PermissionsManager permissionsManager;
     private MapboxMapOptions options;
+    private FloatingActionButton mapSettingsBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +133,15 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        mapSettingsBtn = (FloatingActionButton) findViewById(R.id.map_settings);
+        mapSettingsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }
+        });
+
         InitLocationService();
         drawerSwitch.setChecked(true);
         //Open default fragment
@@ -163,6 +177,18 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onAttachFragment(Fragment fragment) {
+        super.onAttachFragment(fragment);
+
+        //Show/hide floating button. Show only on map fragment.
+        if(fragment.getTag()== "com.mapbox.map") {
+            mapSettingsBtn.show();
+        } else {
+            mapSettingsBtn.hide();
         }
     }
 
@@ -269,7 +295,7 @@ public class MainActivity extends AppCompatActivity
     private void openFriendsFragment() {
         FriendsFragment friendsFragment = new FriendsFragment();
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, friendsFragment,"fragment_friends").commit();
+                .replace(R.id.fragment_container, friendsFragment, "fragment_friends").commit();
         String tag = friendsFragment.getTag();
         Log.w("TAG:", tag);
     }
@@ -288,6 +314,7 @@ public class MainActivity extends AppCompatActivity
 
     private void openMapFragment() {
         mapFragment = SupportMapFragment.newInstance(options);
+        setTitle(R.string.navigation_map);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, mapFragment, "com.mapbox.map").commit();
 
