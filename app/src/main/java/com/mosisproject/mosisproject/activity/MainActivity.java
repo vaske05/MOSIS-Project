@@ -1,6 +1,7 @@
 package com.mosisproject.mosisproject.activity;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -70,6 +71,9 @@ public class MainActivity extends AppCompatActivity
     private PermissionsManager permissionsManager;
     private MapboxMapOptions options;
     private FloatingActionButton mapSettingsBtn;
+    private SwitchCompat drawerSwitch;
+    private Dialog dialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,8 +123,17 @@ public class MainActivity extends AppCompatActivity
 
         updateNavigationProfile(navigationView);
 
+        setupButtons(navigationView);
+
+        InitLocationService();
+        drawerSwitch.setChecked(true);
+        //Open default fragment
+        openFriendsFragment();
+    }
+
+    private void setupButtons(NavigationView navigationView) {
         //Tracking switch listener
-        SwitchCompat drawerSwitch = (SwitchCompat) navigationView.getMenu().findItem(R.id.nav_tracking)
+        drawerSwitch = (SwitchCompat) navigationView.getMenu().findItem(R.id.nav_tracking)
                 .getActionView().findViewById(R.id.drawer_switch);
         drawerSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -133,19 +146,20 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //Map settings button listener
         mapSettingsBtn = (FloatingActionButton) findViewById(R.id.map_settings);
         mapSettingsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                dialog = new Dialog(view.getContext());
+                dialog.setContentView(R.layout.map_settings_dialog);
+                dialog.setTitle("Map preferences");
+                //dialog.setCancelable(false);
+                dialog.show();
+
+
             }
         });
-
-        InitLocationService();
-        drawerSwitch.setChecked(true);
-        //Open default fragment
-        openFriendsFragment();
     }
 
     private void InitLocationService() {
