@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mapbox.android.core.permissions.PermissionsListener;
@@ -84,6 +85,8 @@ public class MainActivity extends AppCompatActivity
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
         user = firebaseAuth.getCurrentUser();
+
+        subscribeToTopics(user.getUid());
 
         Mapbox.getInstance(this, getString(R.string.access_token));
 
@@ -386,7 +389,9 @@ public class MainActivity extends AppCompatActivity
     @Override
 
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (permissionsManager != null) {
+            permissionsManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override
@@ -456,4 +461,9 @@ public class MainActivity extends AppCompatActivity
                 permissionsManager.requestLocationPermissions(this);
             }
         }
+
+    private void subscribeToTopics(String id) {
+        FirebaseMessaging.getInstance().subscribeToTopic("radiusNotification-" + id);
+        //Toast.makeText(getApplicationContext(), "Subscribed to eventConfirmationFor-" + mail, Toast.LENGTH_LONG).show();
+    }
 }

@@ -1,7 +1,7 @@
 {
   "project_info": {
     "project_number": "1050771715519",
-    "firebase_url": "https://mosisproject2018.firebaseio.com/",
+    "firebase_url": "https://mosisproject2018.firebaseio.com",
     "project_id": "mosisproject2018",
     "storage_bucket": "mosisproject2018.appspot.com"
   },
@@ -14,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1050771715519-fjv7rljuafktm6hik1ihorq43gdv7cn1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mosisproject.mosisproject",
+            "certificate_hash": "e27063245517aa5be8b9b9ed55d7d5f31a5790b7"
+          }
+        },
         {
           "client_id": "1050771715519-gvgbijbpnqbreu6kr9tghffarh8f2kt6.apps.googleusercontent.com",
           "client_type": 3
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1050771715519-gvgbijbpnqbreu6kr9tghffarh8f2kt6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
