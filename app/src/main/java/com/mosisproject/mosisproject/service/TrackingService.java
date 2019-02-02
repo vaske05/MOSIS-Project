@@ -42,6 +42,7 @@ public class TrackingService extends Service {
     private LocationRequest request;
     private FusedLocationProviderClient locationClient;
     private NotificationManager notificationManager;
+    private boolean updateLocation;
     public static final String NOTIFICATION_CHANNEL_ID = "10001";
 
     private static final String TAG = TrackingService.class.getSimpleName();
@@ -54,6 +55,7 @@ public class TrackingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        updateLocation = true;
         buildNotification();
         requestLocationUpdates();
         Log.i(TAG, "Service onCreate");
@@ -65,6 +67,7 @@ public class TrackingService extends Service {
         locationClient.removeLocationUpdates(locationCallback);
         //unregisterReceiver(stopReceiver);
         Log.i(TAG, "Service onDestroyed");
+        updateLocation = false;
     }
 
     private void buildNotification() {
@@ -143,8 +146,11 @@ public class TrackingService extends Service {
                                 userLocation.setLatitude(location.getLatitude());
                                 userLocation.setLongitude(location.getLongitude());
 
-                                user.setUserLocation(userLocation);
-                                databaseReference.setValue(user);
+                                if (updateLocation || user.setUserLocation(userLocation))
+                                {
+                                    databaseReference.setValue(user);
+                                    updateLocation = false;
+                                }
                             }
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {

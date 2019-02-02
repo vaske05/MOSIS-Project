@@ -1,5 +1,7 @@
 package com.mosisproject.mosisproject.model;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,7 +96,15 @@ public class User {
         return userLocation;
     }
 
-    public void setUserLocation(UserLocation userLocation) {
-        this.userLocation = userLocation;
+    public boolean setUserLocation(UserLocation location) {
+        double latDiff = Math.abs(userLocation.latitude - location.latitude);
+        double longDiff = Math.abs(userLocation.longitude - location.longitude);
+
+        if (latDiff > 0.05 || longDiff > 0.05)
+        {
+            this.userLocation = location;
+            return true;
+        }
+        return false;
     }
 }
