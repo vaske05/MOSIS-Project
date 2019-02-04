@@ -4,11 +4,13 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -30,14 +32,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Icon;
+import com.mapbox.mapboxsdk.annotations.IconFactory;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -50,13 +62,19 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mosisproject.mosisproject.fragment.RankingsFragment;
+import com.mosisproject.mosisproject.model.User;
 import com.mosisproject.mosisproject.module.GlideApp;
 import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.fragment.AddFriendFragment;
 import com.mosisproject.mosisproject.fragment.FriendsFragment;
 import com.mosisproject.mosisproject.service.TrackingService;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, PermissionsListener {
@@ -68,12 +86,24 @@ public class MainActivity extends AppCompatActivity
     private StorageReference storageReference;
     private FirebaseUser user;
     private SupportMapFragment mapFragment;
-    private MapboxMap mapboxMap;
+    public MapboxMap mapboxMap;
     private PermissionsManager permissionsManager;
     private MapboxMapOptions options;
     private FloatingActionButton mapSettingsBtn;
     private SwitchCompat drawerSwitch;
+    private SwitchCompat showFriendsLocationSwitch;
+    private SwitchCompat realTimeLocationSwitch;
     private Dialog dialog;
+
+    private FirebaseDatabase firebaseDatabase;
+    List<String> userIdList = new ArrayList<>();
+    List<User> friendsList = new ArrayList<>();
+
+    private Timer timer;
+    private TimerTask timerTask;
+    private Handler handler = new Handler();
+    private boolean switchChecked1;
+    private boolean switchChecked2;
 
 
     @Override
@@ -81,10 +111,13 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
         user = firebaseAuth.getCurrentUser();
+        switchChecked1 = false;
+        switchChecked2 = false;
 
         subscribeToTopics(user.getUid());
 
@@ -127,14 +160,17 @@ public class MainActivity extends AppCompatActivity
         updateNavigationProfile(navigationView);
 
         setupButtons(navigationView);
+        loadFirends();
 
         InitLocationService();
-        drawerSwitch.setChecked(true);
+        //drawerSwitch.setChecked(true);
         //Open default fragment
         openFriendsFragment();
     }
 
     private void setupButtons(NavigationView navigationView) {
+
+
         //Tracking switch listener
         drawerSwitch = (SwitchCompat) navigationView.getMenu().findItem(R.id.nav_tracking)
                 .getActionView().findViewById(R.id.drawer_switch);
@@ -160,9 +196,42 @@ public class MainActivity extends AppCompatActivity
                 //dialog.setCancelable(false);
                 dialog.show();
 
+                showFriendsLocationSwitch = dialog.findViewById(R.id.showFriendsLocation);
+                realTimeLocationSwitch = dialog.findViewById(R.id.realTimeLocation);
 
+                showFriendsLocationSwitch.setChecked(switchChecked1);
+                realTimeLocationSwitch.setChecked(switchChecked2);
+                showFriendsLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            switchChecked1 = isChecked;
+                            startFriendsLocationService();
+                        } else {
+                            switchChecked1 = isChecked;
+                            stopFriendsLocationService();
+                        }
+
+                    }
+                });
+
+                realTimeLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if(isChecked) {
+                            switchChecked2 = isChecked;
+                            startTimer();
+                        } else {
+                            switchChecked2 = isChecked;
+                            stopTimer();
+                        }
+
+                    }
+                });
             }
         });
+
+
     }
 
     private void InitLocationService() {
@@ -178,7 +247,7 @@ public class MainActivity extends AppCompatActivity
 
         //If the location permission has been granted, then start the TrackerService//
         if (permission == PackageManager.PERMISSION_GRANTED) {
-            startTrackerService();
+            //startTrackerService();
         } else {
 
         //If the app doesn’t currently have access to the user’s location, then request access//
@@ -339,43 +408,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    @SuppressWarnings({"MissingPermission"})
-    public void onStart() {
-        super.onStart();
-        mapFragment.onStart();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mapFragment.onResume();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mapFragment.onPause();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mapFragment.onStop();
-    }
-
-    @Override
-    public void onLowMemory() {
-        super.onLowMemory();
-        mapFragment.onLowMemory();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapFragment.onDestroy();
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mapFragment.onSaveInstanceState(outState);
@@ -416,15 +448,120 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void startFriendsLocationService() {
+        loadFirends();
+        showLocationMarkers();
+    }
+
+    private void stopFriendsLocationService() {
+        clearMarkers();
+    }
+
+    private void clearMarkers() {
+        List<Marker> markers = mapboxMap.getMarkers();
+        for(int i = 0; i < markers.size(); i++) {
+            markers.get(i).remove();
+        }
+    }
+
+    //To stop timer
+    private void stopTimer(){
+        if(timer != null){
+            timer.cancel();
+            timer.purge();
+        }
+    }
+
+    //To start timer
+    private void startTimer(){
+        timer = new Timer();
+        timerTask = new TimerTask() {
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run(){
+                        clearMarkers();
+                        loadFirends();
+                        showLocationMarkers();
+                    }
+                });
+            }
+        };
+        timer.schedule(timerTask, 2000, 2000);
+    }
+
+    public void showLocationMarkers(){
+        Log.i("TEST", "ShowMarkers");
+        for(int i = 0; i < friendsList.size(); i++) {
+            mapboxMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(friendsList.get(i).getUserLocation().getLatitude(), friendsList.get(i).getUserLocation().getLongitude()))
+                    //.title(fullName + " Lat:" + lat.toString() + "Lng:" + lng.toString())
+                    .icon(friendsList.get(i).getMarkerIcon())
+                    .setTitle(friendsList.get(i).getName() + " " + friendsList.get(i).getSurname())
+            );
+        }
+
+    }
+
+    private void addFriendToList(final User friend) {
+        File localFile = null;
+        try {
+            localFile = File.createTempFile(friend.getId(), ".jpg");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        final File localFileFinal = localFile;
+
+        StorageReference sRef = storageReference.child("profile_images/" + friend.getId() + ".jpg");
+        sRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                Bitmap bitmap = BitmapFactory.decodeFile(localFileFinal.getAbsolutePath());
+                bitmap = bitmap.createScaledBitmap(bitmap, 70, 70, true);
+                Icon icon = IconFactory.getInstance(MainActivity.this).fromBitmap(bitmap);
+                friend.setMarkerIcon(icon);
+                friendsList.add(friend);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void loadFirends() {
+        firebaseDatabase.getReference().addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                friendsList.clear();
+                userIdList.clear();
+                final User userRecord = dataSnapshot.child("Users").child(user.getUid()).getValue(User.class);
+                userIdList = new ArrayList<>(userRecord.getFriendsList());
+                userIdList.remove(0);
+                for(int i = 0; i < userIdList.size(); i++) {
+                    User friend = dataSnapshot.child("Users").child(userIdList.get(i)).getValue(User.class);
+                    if (friend != null) {
+                        //friendsList.add(friend);
+                        addFriendToList(friend);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
     @Override
     public void onMapReady(@NonNull MapboxMap _mapboxMap) {
         MainActivity.this.mapboxMap = _mapboxMap;
         mapboxMap.addOnMapClickListener(new MapboxMap.OnMapClickListener() {
             @Override
             public boolean onMapClick(@NonNull LatLng point) {
-
-                mapboxMap.addMarker(new MarkerOptions().position(point).title(point.toString()));
-
+                //mapboxMap.addMarker(new MarkerOptions().position(point).title(point.toString()));
                 return true;
             }
         });
@@ -465,5 +602,42 @@ public class MainActivity extends AppCompatActivity
     private void subscribeToTopics(String id) {
         FirebaseMessaging.getInstance().subscribeToTopic("radiusNotification-" + id);
         //Toast.makeText(getApplicationContext(), "Subscribed to eventConfirmationFor-" + mail, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    @SuppressWarnings({"MissingPermission"})
+    public void onStart() {
+        super.onStart();
+        mapFragment.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapFragment.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapFragment.onPause();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapFragment.onStop();
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapFragment.onLowMemory();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mapFragment.onDestroy();
     }
 }

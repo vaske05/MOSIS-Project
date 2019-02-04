@@ -2,20 +2,28 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_margin="5dp"
     android:background="#FFFFFF"
     android:orientation="vertical"
-    android:minWidth="100dp"
+    android:minWidth="200dp"
     android:minHeight="200dp">
 
-    <TextView
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/showFriendsLocation"
+        android:text="Friends location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="TEST TEST TEST" />
+        app:actionLayout="@layout/layout_switch"
+        />
 
     <android.support.v7.widget.SwitchCompat
+        android:id="@+id/realTimeLocation"
+        android:text="Real time location"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:actionLayout="@layout/layout_switch"
+        />
 
 
 

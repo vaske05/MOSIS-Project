@@ -145,12 +145,13 @@ public class TrackingService extends Service {
 
                                 userLocation.setLatitude(location.getLatitude());
                                 userLocation.setLongitude(location.getLongitude());
+                                user.setUserLocation(userLocation);
 
-                                if (updateLocation || user.setUserLocation(userLocation))
-                                {
+//                                if (updateLocation || user.setUserLocation(userLocation))
+//                                {
                                     databaseReference.setValue(user);
-                                    updateLocation = false;
-                                }
+                                    //updateLocation = false;
+                                //}
                             }
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
