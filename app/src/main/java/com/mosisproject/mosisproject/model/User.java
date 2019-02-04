@@ -2,6 +2,8 @@ package com.mosisproject.mosisproject.model;
 
 import android.util.Log;
 
+import com.mapbox.mapboxsdk.annotations.Icon;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ public class User {
     public String points;
     public List<String> friendsList;
     public UserLocation userLocation;
+    public Icon markerIcon;
 
     public User() {
     }
@@ -40,7 +43,7 @@ public class User {
         this.friendsList.add(friend);
     }
 
-    public void removeFriend(String friend) {
+    public void removeFriend(String friend) {//
         this.friendsList.remove(friend);
     }
 
@@ -92,19 +95,27 @@ public class User {
         this.points = points;
     }
 
+    public Icon getMarkerIcon() {
+        return markerIcon;
+    }
+
+    public void setMarkerIcon(Icon markerIcon) {
+        this.markerIcon = markerIcon;
+    }
+
     public UserLocation getUserLocation() {
         return userLocation;
     }
 
-    public boolean setUserLocation(UserLocation location) {
-        double latDiff = Math.abs(userLocation.latitude - location.latitude);
-        double longDiff = Math.abs(userLocation.longitude - location.longitude);
-
-        if (latDiff > 0.05 || longDiff > 0.05)
-        {
+    public void setUserLocation(UserLocation location) {
+//        double latDiff = Math.abs(userLocation.latitude - location.latitude);
+//        double longDiff = Math.abs(userLocation.longitude - location.longitude);
+//
+//        if (latDiff > 0.05 || longDiff > 0.05)
+//        {
             this.userLocation = location;
-            return true;
-        }
-        return false;
+//            return true;
+//        }
+//        return false;
     }
 }
