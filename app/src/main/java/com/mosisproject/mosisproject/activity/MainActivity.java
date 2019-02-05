@@ -4,8 +4,6 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,27 +28,16 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
@@ -67,10 +54,8 @@ import com.mosisproject.mosisproject.module.GlideApp;
 import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.fragment.AddFriendFragment;
 import com.mosisproject.mosisproject.fragment.FriendsFragment;
+import com.mosisproject.mosisproject.service.FriendsLocationService;
 import com.mosisproject.mosisproject.service.TrackingService;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -104,6 +89,8 @@ public class MainActivity extends AppCompatActivity
     private Handler handler = new Handler();
     private boolean switchChecked1;
     private boolean switchChecked2;
+
+    private FriendsLocationService friendsLocationService;
 
 
     @Override
@@ -156,15 +143,14 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
         updateNavigationProfile(navigationView);
 
+        friendsLocationService = new FriendsLocationService(mapboxMap, this);
+        friendsLocationService.loadFriends();
+
         setupButtons(navigationView);
-        loadFirends();
 
         InitLocationService();
-        //drawerSwitch.setChecked(true);
-        //Open default fragment
         openFriendsFragment();
     }
 
@@ -190,14 +176,17 @@ public class MainActivity extends AppCompatActivity
                 dialog = new Dialog(view.getContext());
                 dialog.setContentView(R.layout.map_settings_dialog);
                 dialog.setTitle("Map preferences");
-                //dialog.setCancelable(false);
                 dialog.show();
 
                 showFriendsLocationSwitch = dialog.findViewById(R.id.showFriendsLocation);
                 realTimeLocationSwitch = dialog.findViewById(R.id.realTimeLocation);
+                realTimeLocationSwitch.setClickable(switchChecked1);
+                showFriendsLocationSwitch.setClickable(!switchChecked2);
+
 
                 showFriendsLocationSwitch.setChecked(switchChecked1);
                 realTimeLocationSwitch.setChecked(switchChecked2);
+
 
                 showFriendsLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
@@ -205,25 +194,27 @@ public class MainActivity extends AppCompatActivity
                         if (isChecked) {
                             switchChecked1 = isChecked;
                             startFriendsLocationService();
+                            realTimeLocationSwitch.setClickable(true);
                         } else {
                             switchChecked1 = isChecked;
                             stopFriendsLocationService();
+                            realTimeLocationSwitch.setClickable(false);
                         }
 
                     }
                 });
-
                 realTimeLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if(isChecked) {
                             switchChecked2 = isChecked;
-                            startTimer();
+                            friendsLocationService.startTimer();
+                            showFriendsLocationSwitch.setClickable(false);
                         } else {
                             switchChecked2 = isChecked;
-                            stopTimer();
+                            friendsLocationService.stopTimer();
+                            showFriendsLocationSwitch.setClickable(true);
                         }
-
                     }
                 });
             }
@@ -232,26 +223,23 @@ public class MainActivity extends AppCompatActivity
 
     private void InitLocationService() {
         //Check whether GPS tracking is enabled//
-
         LocationManager lm = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             finish();
         }
-
         int permission = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
-
         //If the location permission has been granted, then start the TrackerService//
         if (permission == PackageManager.PERMISSION_GRANTED) {
             //startTrackerService();
         } else {
-
         //If the app doesn’t currently have access to the user’s location, then request access//
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     PERMISSIONS_REQUEST);
         }
     }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -265,7 +253,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
-
         //Show/hide floating button. Show only on map fragment.
         if(fragment.getTag()== "com.mapbox.map") {
             mapSettingsBtn.show();
@@ -287,7 +274,6 @@ public class MainActivity extends AppCompatActivity
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         return super.onOptionsItemSelected(item);
     }
@@ -311,7 +297,6 @@ public class MainActivity extends AppCompatActivity
         }  else if (id == R.id.nav_logout) {
             userLogout();
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -411,7 +396,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-
     public void onExplanationNeeded(List<String> permissionsToExplain) {
         Toast.makeText(this, "Enable permissions", Toast.LENGTH_LONG).show();
     }
@@ -433,6 +417,7 @@ public class MainActivity extends AppCompatActivity
             finish();
         }
     }
+
     private void startTrackerService() {
         startService(new Intent(this, TrackingService.class));
         //Notify the user that tracking has been enabled//
@@ -442,119 +427,21 @@ public class MainActivity extends AppCompatActivity
     private void stopTrackingService() {
         stopService(new Intent(this, TrackingService.class));
         Toast.makeText(this, "GPS tracking disabled", Toast.LENGTH_SHORT).show();
-
     }
 
     private void startFriendsLocationService() {
-        loadFirends();
-        showLocationMarkers();
+        friendsLocationService.loadFriends();
+        friendsLocationService.showLocationMarkers();
     }
 
     private void stopFriendsLocationService() {
-        clearMarkers();
-    }
-
-    private void clearMarkers() {
-        List<Marker> markers = mapboxMap.getMarkers();
-        for(int i = 0; i < markers.size(); i++) {
-            markers.get(i).remove();
-        }
-    }
-
-    //To stop timer
-    private void stopTimer(){
-        if(timer != null){
-            timer.cancel();
-            timer.purge();
-        }
-    }
-
-    //To start timer
-    private void startTimer(){
-        timer = new Timer();
-        timerTask = new TimerTask() {
-            public void run() {
-                handler.post(new Runnable() {
-                    public void run(){
-                        clearMarkers();
-                        loadFirends();
-                        showLocationMarkers();
-                    }
-                });
-            }
-        };
-        timer.schedule(timerTask, 2000, 2000);
-    }
-
-    public void showLocationMarkers(){
-        Log.i("TEST", "ShowMarkers");
-        for(int i = 0; i < friendsList.size(); i++) {
-            mapboxMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(friendsList.get(i).getUserLocation().getLatitude(), friendsList.get(i).getUserLocation().getLongitude()))
-                    //.title(fullName + " Lat:" + lat.toString() + "Lng:" + lng.toString())
-                    .icon(friendsList.get(i).getMarkerIcon())
-                    .setTitle(friendsList.get(i).getName() + " " + friendsList.get(i).getSurname())
-            );
-        }
-
-    }
-
-    private void addFriendToList(final User friend) {
-        File localFile = null;
-        try {
-            localFile = File.createTempFile(friend.getId(), ".jpg");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        final File localFileFinal = localFile;
-
-        StorageReference sRef = storageReference.child("profile_images/" + friend.getId() + ".jpg");
-        sRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                Bitmap bitmap = BitmapFactory.decodeFile(localFileFinal.getAbsolutePath());
-                bitmap = bitmap.createScaledBitmap(bitmap, 70, 70, true);
-                Icon icon = IconFactory.getInstance(MainActivity.this).fromBitmap(bitmap);
-                friend.setMarkerIcon(icon);
-                friendsList.add(friend);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
-
-    private void loadFirends() {
-        firebaseDatabase.getReference().addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                friendsList.clear();
-                userIdList.clear();
-                final User userRecord = dataSnapshot.child("Users").child(user.getUid()).getValue(User.class);
-                userIdList = new ArrayList<>(userRecord.getFriendsList());
-                userIdList.remove(0);
-                for(int i = 0; i < userIdList.size(); i++) {
-                    User friend = dataSnapshot.child("Users").child(userIdList.get(i)).getValue(User.class);
-                    if (friend != null) {
-                        //friendsList.add(friend);
-                        addFriendToList(friend);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-
+        friendsLocationService.clearMarkers();
     }
 
     @Override
     public void onMapReady(@NonNull MapboxMap _mapboxMap) {
         MainActivity.this.mapboxMap = _mapboxMap;
+        friendsLocationService.setMapboxMap(mapboxMap);
         mapboxMap.addOnMapClickListener(new MapboxMap.OnMapClickListener() {
             @Override
             public boolean onMapClick(@NonNull LatLng point) {
@@ -562,7 +449,6 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
-
         mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
@@ -574,22 +460,16 @@ public class MainActivity extends AppCompatActivity
         private void enableLocationComponent() {
             // Check if permissions are enabled and if not request
             if (PermissionsManager.areLocationPermissionsGranted(this)) {
-
                 // Get an instance of the component
                 LocationComponent locationComponent = mapboxMap.getLocationComponent();
-
                 // Activate
                 locationComponent.activateLocationComponent(this, mapboxMap.getStyle());
-
                 // Enable to make component visible
                 locationComponent.setLocationComponentEnabled(true);
-
                 // Set the component's camera mode
                 locationComponent.setCameraMode(CameraMode.TRACKING);
-
                 // Set the component's render mode
                 locationComponent.setRenderMode(RenderMode.COMPASS);
-
             } else {
                 permissionsManager = new PermissionsManager(this);
                 permissionsManager.requestLocationPermissions(this);
