@@ -169,8 +169,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setupButtons(NavigationView navigationView) {
-
-
         //Tracking switch listener
         drawerSwitch = (SwitchCompat) navigationView.getMenu().findItem(R.id.nav_tracking)
                 .getActionView().findViewById(R.id.drawer_switch);
@@ -184,7 +182,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         });
-
         //Map settings button listener
         mapSettingsBtn = (FloatingActionButton) findViewById(R.id.map_settings);
         mapSettingsBtn.setOnClickListener(new View.OnClickListener() {
@@ -201,6 +198,7 @@ public class MainActivity extends AppCompatActivity
 
                 showFriendsLocationSwitch.setChecked(switchChecked1);
                 realTimeLocationSwitch.setChecked(switchChecked2);
+
                 showFriendsLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -230,8 +228,6 @@ public class MainActivity extends AppCompatActivity
                 });
             }
         });
-
-
     }
 
     private void InitLocationService() {
@@ -326,6 +322,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void userLogout() {
+        stopTrackingService();
         firebaseAuth.signOut();
         finish(); // Closing activity
         startLoginActivity();

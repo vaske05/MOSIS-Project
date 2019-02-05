@@ -9,7 +9,7 @@
     <string name="test_password">12344321</string>
     <string name="firebase_path">location</string>
     <!-- Strings related to login -->
-    <string name="name_in_icon_launcher">mosisApp</string>
+    <string name="name_in_icon_launcher">Go Bean</string>
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password (optional)</string>
     <string name="action_sign_in"> or register</string>
