@@ -14,7 +14,7 @@
         android:text="Friends location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:actionLayout="@layout/layout_switch"
+        android:theme="@style/SCBSwitch"
         />
 
     <android.support.v7.widget.SwitchCompat
@@ -22,7 +22,7 @@
         android:text="Real time location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:actionLayout="@layout/layout_switch"
+        android:theme="@style/SCBSwitch"
         />
 
 
