@@ -120,9 +120,9 @@ public class FriendsLocationService {
                     //.title(fullName + " Lat:" + lat.toString() + "Lng:" + lng.toString())
                     .icon(friendsList.get(i).getMarkerIcon())
                     .setTitle(friendsList.get(i).getName() + " " + friendsList.get(i).getSurname())
+                    .setSnippet("Email:" + friendsList.get(i).getEmail() + "\n" + "Phone:" + friendsList.get(i).getPhone())
             );
         }
-
     }
 
     //To stop timer
