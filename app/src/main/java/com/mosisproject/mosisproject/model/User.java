@@ -15,7 +15,7 @@ public class User {
     public String email;
     public String points;
     public List<String> friendsList;
-    public UserLocation userLocation;
+    public UserLocation userLocation = new UserLocation();
     public Icon markerIcon;
 
     public User() {
@@ -108,14 +108,7 @@ public class User {
     }
 
     public void setUserLocation(UserLocation location) {
-//        double latDiff = Math.abs(userLocation.latitude - location.latitude);
-//        double longDiff = Math.abs(userLocation.longitude - location.longitude);
-//
-//        if (latDiff > 0.05 || longDiff > 0.05)
-//        {
-            this.userLocation = location;
-//            return true;
-//        }
-//        return false;
+
+        this.userLocation = location;
     }
 }

@@ -35,6 +35,8 @@ import android.app.Service;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Date;
+
 public class TrackingService extends Service {
 
     private DatabaseReference databaseReference;
@@ -42,7 +44,8 @@ public class TrackingService extends Service {
     private LocationRequest request;
     private FusedLocationProviderClient locationClient;
     private NotificationManager notificationManager;
-    private boolean updateLocation;
+    private boolean InitLocationUpdate;
+
     public static final String NOTIFICATION_CHANNEL_ID = "10001";
 
     private static final String TAG = TrackingService.class.getSimpleName();
@@ -55,9 +58,9 @@ public class TrackingService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        updateLocation = true;
-        buildNotification();
+        //buildNotification();
         requestLocationUpdates();
+        InitLocationUpdate = true;
         Log.i(TAG, "Service onCreate");
     }
 
@@ -65,9 +68,9 @@ public class TrackingService extends Service {
     public void onDestroy() {
         super.onDestroy();
         locationClient.removeLocationUpdates(locationCallback);
+        InitLocationUpdate = false;
         //unregisterReceiver(stopReceiver);
         Log.i(TAG, "Service onDestroyed");
-        updateLocation = false;
     }
 
     private void buildNotification() {
@@ -127,7 +130,6 @@ public class TrackingService extends Service {
 
         //If the app currently has access to the location permission...//
         if (permission == PackageManager.PERMISSION_GRANTED) {
-        //...then request location updates//
             locationClient.requestLocationUpdates(request,locationCallback = new LocationCallback() {
                 @Override
                 public void onLocationResult(LocationResult locationResult) {
@@ -143,15 +145,17 @@ public class TrackingService extends Service {
                                 final User user = dataSnapshot.getValue(User.class);
                                 UserLocation userLocation = new UserLocation();
 
-                                userLocation.setLatitude(location.getLatitude());
-                                userLocation.setLongitude(location.getLongitude());
-                                user.setUserLocation(userLocation);
+                                userLocation.setDateTime(user.userLocation.getDateTime());
 
-//                                if (updateLocation || user.setUserLocation(userLocation))
-//                                {
+                                if (InitLocationUpdate || userLocation.ShouldUpdate(user.userLocation.getDateTime())) {
+                                    InitLocationUpdate = false;
+                                    userLocation.setLatitude(location.getLatitude());
+                                    userLocation.setLongitude(location.getLongitude());
+                                    userLocation.setDateTime(new Date());
+                                    user.setUserLocation(userLocation);
+
                                     databaseReference.setValue(user);
-                                    //updateLocation = false;
-                                //}
+                                }
                             }
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
