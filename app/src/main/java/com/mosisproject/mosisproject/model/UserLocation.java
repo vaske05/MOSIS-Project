@@ -38,21 +38,4 @@ public class UserLocation {
 
     public void setDateTime(Date dateTime) { this.dateTime = dateTime;}
 
-    public boolean ShouldUpdate(Date oldDate)
-    {
-        if (dateTime == null) return true;
-
-        Date newDate = new Date();
-        long diffInMilisec = Math.abs(newDate.getTime() - oldDate.getTime());
-        long diffSeconds = diffInMilisec / 1000 % 60;
-        long diffHours = diffInMilisec / (60 * 60 * 1000) % 24;
-
-        Log.i(TAG, "ShouldUpdate: " + diffSeconds);
-        if (diffSeconds > 5) {
-            return true;
-        }
-
-        return false;
-    }
-
 }

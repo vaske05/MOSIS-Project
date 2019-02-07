@@ -22,6 +22,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mosisproject.mosisproject.adapter.FriendsAdapter;
 import com.mosisproject.mosisproject.R;
+import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class FriendsFragment extends Fragment {
     private StorageReference storageReference;
     String userId;
    // List<User> userList = new ArrayList<>();
-    List<String> userIdList = new ArrayList<>();
+    List<Friend> userIdList = new ArrayList<>();
     List<User> userList = new ArrayList<>();
     ListView listViewFriends;
     private FriendsAdapter friendsAdapter;
@@ -82,10 +83,11 @@ public class FriendsFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 spinner.setVisibility(View.VISIBLE);
                 final User user = dataSnapshot.child("Users").child(userId).getValue(User.class);
-                userIdList = new ArrayList<>(user.getFriendsList());
+                userIdList = user.getFriendsList();
+                if (userIdList == null) return;
                 userIdList.remove(0);
                 for(int i = 0; i < userIdList.size(); i++) {
-                    User friend = dataSnapshot.child("Users").child(userIdList.get(i)).getValue(User.class);
+                    User friend = dataSnapshot.child("Users").child(userIdList.get(i).getFriendId()).getValue(User.class);
                     if (friend != null) {
                         userList.add(friend);
                     }

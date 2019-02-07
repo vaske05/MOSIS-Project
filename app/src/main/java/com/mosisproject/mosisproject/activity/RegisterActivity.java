@@ -36,8 +36,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.mosisproject.mosisproject.R;
+import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
 import com.google.firebase.database.FirebaseDatabase;
+
+
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -143,8 +146,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()) {
                             //Store user
-                            List<String> friends= new ArrayList<>();
-                            friends.add("init");
+                            List<Friend> friends= new ArrayList<>();
+                            friends.add(new Friend("init"));
                             storeUser(name, surname, email, phone,"0", friends);
                             //Store profile image
                             storeImage();
@@ -180,7 +183,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 });
     }
 
-    private void storeUser(String name, String surname, String email, String phone,String points, List<String > friends) { //TODO: URADII da vraca true ili false
+    private void storeUser(String name, String surname, String email, String phone,String points, List<Friend> friends) { //TODO: URADII da vraca true ili false
         String userId = firebaseAuth.getCurrentUser().getUid();
         User user = new User(userId, name, surname, email, phone, points, friends);
         database.getReference("Users")

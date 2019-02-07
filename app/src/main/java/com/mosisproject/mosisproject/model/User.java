@@ -14,14 +14,15 @@ public class User {
     public String phone;
     public String email;
     public String points;
-    public List<String> friendsList;
+    public Friend friend;
+    public List<Friend> friendsList;
     public UserLocation userLocation = new UserLocation();
     public Icon markerIcon;
 
     public User() {
     }
 
-    public User(String id, String name, String surname, String email, String phone, String points, List<String> friends) {
+    public User(String id, String name, String surname, String email, String phone, String points, List<Friend> friends) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -31,16 +32,17 @@ public class User {
         this.friendsList = friends;
     }
 
-    public List<String> getFriendsList() {
+    public List<Friend> getFriendsList() {
         return friendsList;
     }
 
-    public void setFriendsList(List<String> friendsList) {
+    public void setFriendsList(List<Friend> friendsList) {
         this.friendsList = friendsList;
     }
 
-    public void addFriend(String friend) {
-        this.friendsList.add(friend);
+    public void addFriend(String friendId) {
+        Friend f = new Friend(friendId);
+        this.friendsList.add(f);
     }
 
     public void removeFriend(String friend) {//

@@ -29,9 +29,10 @@ function distance(lat1, lon1, lat2, lon2, unit) {
 
 exports.radiusNotification = functions.database.ref('Users/{userId}').onUpdate((snapshot, context) => {
 
+	const userId = snapshot.after.val().id;
 	const myLocation = snapshot.after.val().userLocation;
 	const friendList = snapshot.after.val().friendsList || [];
-
+	console.error("Friend list", friendList);
 	const payload = {
 		notification: {
 			title: 'Maybe your friend wants a coffee',
@@ -41,15 +42,33 @@ exports.radiusNotification = functions.database.ref('Users/{userId}').onUpdate((
 
 	return admin.database().ref('Users').once('value').then(snapshot => {
 		
-		const friendUsers = Object.keys(snapshot.val()).filter(key => friendList.indexOf(key) !== -1 && key !== 'init');
-		
-		friendUsers.forEach(key => {
-			const userLocation = snapshot.val()[key].userLocation;			
-			const diffDistance = distance(userLocation.latitude, userLocation.longitude, myLocation.latitude, myLocation.longitude, 'K');
+		const friends = friendList.filter(x => x.friendId !== "init");
 
+		var index = 0;
+		friends.forEach(f => { 
+			index++;
+			const lastUpdate = new Date(f.lastUpdate);
+			const currentTime = new Date();
+			const diff = (currentTime - lastUpdate) / 1000;
+
+			console.info("Last update time: ", diff);
+			if (diff < 3600) {
+				console.info("User is already notified");
+				return null;
+			}
+
+			const userLocation = snapshot.val()[f.friendId].userLocation;
+			const diffDistance = distance(userLocation.latitude, userLocation.longitude, myLocation.latitude, myLocation.longitude, 'K');
+			console.info("Distance is ", diffDistance);
 			if (diffDistance < 0.5) {
-				return admin.messaging().sendToTopic(`radiusNotification-${snapshot.val()[key].id}`, payload);
+				admin.database().ref('Users/' + userId + '/friendsList/' + index).set({
+					friendId : f.friendId,
+					lastUpdate : currentTime.toLocaleString()
+				  });
+
+				return admin.messaging().sendToTopic(`radiusNotification-${f.friendId}`, payload);
 			} else {
+				
 				return null;
 			}
 		})

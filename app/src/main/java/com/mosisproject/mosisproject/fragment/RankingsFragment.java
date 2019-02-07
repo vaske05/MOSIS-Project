@@ -20,6 +20,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.adapter.RankingsAdapter;
+import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
 
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class RankingsFragment extends Fragment {
     private FirebaseStorage firebaseStorage;
 
     private String userId;
-    private List<String> userIdList = new ArrayList<>();
+    private List<Friend> userIdList = new ArrayList<>();
     private List<User> userList = new ArrayList<>();
 
     private ProgressBar spinner;
@@ -77,10 +78,11 @@ public class RankingsFragment extends Fragment {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 //spinner.setVisibility(View.VISIBLE);
                 final User user = dataSnapshot.child("Users").child(userId).getValue(User.class);
-                userIdList = new ArrayList<>(user.getFriendsList());
+                userIdList = user.getFriendsList();
+                if (userIdList == null) return;
                 userIdList.remove(0);
                 for(int i = 0; i < userIdList.size(); i++) {
-                    User friend = dataSnapshot.child("Users").child(userIdList.get(i)).getValue(User.class);
+                    User friend = dataSnapshot.child("Users").child(userIdList.get(i).getFriendId()).getValue(User.class);
                     if (friend != null) {
                         userList.add(friend);
                     }

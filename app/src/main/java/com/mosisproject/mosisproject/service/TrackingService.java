@@ -44,7 +44,6 @@ public class TrackingService extends Service {
     private LocationRequest request;
     private FusedLocationProviderClient locationClient;
     private NotificationManager notificationManager;
-    private boolean InitLocationUpdate;
 
     public static final String NOTIFICATION_CHANNEL_ID = "10001";
 
@@ -60,7 +59,6 @@ public class TrackingService extends Service {
         super.onCreate();
         //buildNotification();
         requestLocationUpdates();
-        InitLocationUpdate = true;
         Log.i(TAG, "Service onCreate");
     }
 
@@ -68,7 +66,6 @@ public class TrackingService extends Service {
     public void onDestroy() {
         super.onDestroy();
         locationClient.removeLocationUpdates(locationCallback);
-        InitLocationUpdate = false;
         //unregisterReceiver(stopReceiver);
         Log.i(TAG, "Service onDestroyed");
     }
@@ -147,15 +144,14 @@ public class TrackingService extends Service {
 
                                 userLocation.setDateTime(user.userLocation.getDateTime());
 
-                                if (InitLocationUpdate || userLocation.ShouldUpdate(user.userLocation.getDateTime())) {
-                                    InitLocationUpdate = false;
-                                    userLocation.setLatitude(location.getLatitude());
-                                    userLocation.setLongitude(location.getLongitude());
-                                    userLocation.setDateTime(new Date());
-                                    user.setUserLocation(userLocation);
 
-                                    databaseReference.setValue(user);
-                                }
+                                userLocation.setLatitude(location.getLatitude());
+                                userLocation.setLongitude(location.getLongitude());
+                                userLocation.setDateTime(new Date());
+                                user.setUserLocation(userLocation);
+
+                                databaseReference.setValue(user);
+
                             }
                             @Override
                             public void onCancelled(@NonNull DatabaseError databaseError) {
