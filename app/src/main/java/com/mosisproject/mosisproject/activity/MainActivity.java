@@ -191,6 +191,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
+                            friendsLocationService.showEventsMarkers();
                             switchChecked1 = isChecked;
                             startFriendsLocationService();
                             realTimeLocationSwitch.setClickable(true);
@@ -367,7 +368,7 @@ public class MainActivity extends AppCompatActivity
 
     private void openAddEventFragment() {
         AddEventFragment addEventFragment = new AddEventFragment();
-        addEventFragment.setMapboxMap(mapboxMap);
+        //addEventFragment.setMapboxMap(mapboxMap);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, addEventFragment, "fragment_addEvent").commit();
     }
@@ -454,7 +455,6 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(@NonNull MapboxMap _mapboxMap) {
         MainActivity.this.mapboxMap = _mapboxMap;
         friendsLocationService.setMapboxMap(mapboxMap);
-        friendsLocationService.showEventsMarkers();
         mapboxMap.addOnMapClickListener(new MapboxMap.OnMapClickListener() {
             @Override
             public boolean onMapClick(@NonNull LatLng point) {
