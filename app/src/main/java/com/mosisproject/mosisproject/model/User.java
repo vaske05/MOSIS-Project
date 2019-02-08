@@ -13,16 +13,16 @@ public class User {
     public String surname;
     public String phone;
     public String email;
-    public String points;
-    public Friend friend;
+    public int points;
     public List<Friend> friendsList;
     public UserLocation userLocation = new UserLocation();
     public Icon markerIcon;
+    public List<Event> eventList;
 
     public User() {
     }
 
-    public User(String id, String name, String surname, String email, String phone, String points, List<Friend> friends) {
+    public User(String id, String name, String surname, String email, String phone, int points, List<Friend> friends, List<Event> events) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -30,6 +30,7 @@ public class User {
         this.email = email;
         this.points = points;
         this.friendsList = friends;
+        this.eventList = events;
     }
 
     public List<Friend> getFriendsList() {
@@ -97,12 +98,12 @@ public class User {
         this.email = email;
     }
 
-    public String getPoints() {
+    public int getPoints() {
         return points;
     }
 
-    public void setPoints(String points) {
-        this.points = points;
+    public void addPoints() {
+        this.points++;
     }
 
     public Icon getMarkerIcon() {
@@ -120,5 +121,17 @@ public class User {
     public void setUserLocation(UserLocation location) {
 
         this.userLocation = location;
+    }
+
+    public List<Event> getEventList() {
+        return eventList;
+    }
+
+    public void setEventList(List<Event> eventList) {
+        this.eventList = eventList;
+    }
+
+    public void addEvent(Event event) {
+        this.eventList.add(event);
     }
 }

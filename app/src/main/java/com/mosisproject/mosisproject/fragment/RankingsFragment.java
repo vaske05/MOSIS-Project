@@ -105,7 +105,7 @@ public class RankingsFragment extends Fragment {
                 int size = userList.size();
                 for(int i = 0; i < size-1; i++) {
                     for (int j = 0; j < size-1-i; j++) {
-                        if(Integer.parseInt( userList.get(j).getPoints()) < Integer.parseInt( userList.get(j+1).getPoints())) {
+                        if(( userList.get(j).getPoints()) < ( userList.get(j+1).getPoints())) {
                             User tempUser = userList.get(j);
                             userList.set(j, userList.get(j+1));
                             userList.set(j+1, tempUser);
