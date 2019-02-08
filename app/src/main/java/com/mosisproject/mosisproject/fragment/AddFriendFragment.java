@@ -36,6 +36,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.mosisproject.mosisproject.R;
+import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
 import com.mosisproject.mosisproject.service.BluetoothConnectionService;
 
@@ -186,6 +187,7 @@ public class AddFriendFragment extends Fragment {
                                                     @Override
                                                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                                                         final User userSender = dataSnapshot.getValue(User.class);
+
                                                         userSender.addFriend(user.getId()); //Add new friend in User sender
                                                         databaseReference.setValue(userSender);
                                                         friendshipSuccess = true;
@@ -248,9 +250,9 @@ public class AddFriendFragment extends Fragment {
      * @return true if user have this friend in friendList
      */
     private boolean checkFriendship(User user,String readMessage ) {
-        List<String> friendList = user.getFriendsList();
+        List<Friend> friendList = user.getFriendsList();
         for(int i = 0; i < friendList.size(); i++) {
-            if(friendList.get(i).equals(readMessage)) {
+            if(friendList.get(i).getFriendId().equals(readMessage)) {
                 return true;
             }
         }

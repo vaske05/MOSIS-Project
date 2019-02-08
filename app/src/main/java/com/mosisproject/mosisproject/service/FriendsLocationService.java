@@ -24,6 +24,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
 
 import java.io.File;
@@ -44,7 +45,7 @@ public class FriendsLocationService {
     private FirebaseUser user;
     private FirebaseDatabase firebaseDatabase;
 
-    private List<String> userIdList = new ArrayList<>();
+    private List<Friend> userIdList = new ArrayList<>();
     private List<User> friendsList = new ArrayList<>();
 
     private Timer timer;
@@ -68,10 +69,11 @@ public class FriendsLocationService {
                 friendsList.clear();
                 userIdList.clear();
                 final User userRecord = dataSnapshot.child("Users").child(user.getUid()).getValue(User.class);
-                userIdList = new ArrayList<>(userRecord.getFriendsList());
+                userIdList = userRecord.getFriendsList();
+                if (userIdList == null) return;
                 userIdList.remove(0);
                 for(int i = 0; i < userIdList.size(); i++) {
-                    User friend = dataSnapshot.child("Users").child(userIdList.get(i)).getValue(User.class);
+                    User friend = dataSnapshot.child("Users").child(userIdList.get(i).getFriendId()).getValue(User.class);
                     if (friend != null) {
                         addFriendToList(friend);
                     }

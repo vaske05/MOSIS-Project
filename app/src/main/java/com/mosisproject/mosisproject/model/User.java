@@ -14,7 +14,7 @@ public class User {
     public String phone;
     public String email;
     public int points;
-    public List<String> friendsList;
+    public List<Friend> friendsList;
     public UserLocation userLocation = new UserLocation();
     public Icon markerIcon;
     public List<Event> eventList;
@@ -22,7 +22,7 @@ public class User {
     public User() {
     }
 
-    public User(String id, String name, String surname, String email, String phone, int points, List<String> friends, List<Event> events) {
+    public User(String id, String name, String surname, String email, String phone, int points, List<Friend> friends, List<Event> events) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -33,20 +33,29 @@ public class User {
         this.eventList = events;
     }
 
-    public List<String> getFriendsList() {
+    public List<Friend> getFriendsList() {
         return friendsList;
     }
 
-    public void setFriendsList(List<String> friendsList) {
+    public void setFriendsList(List<Friend> friendsList) {
         this.friendsList = friendsList;
     }
 
-    public void addFriend(String friend) {
-        this.friendsList.add(friend);
+    public void addFriend(String friendId) {
+        Friend f = new Friend(friendId);
+        this.friendsList.add(f);
     }
 
-    public void removeFriend(String friend) {//
-        this.friendsList.remove(friend);
+    public void removeFriend(String id) {//
+        for (int i = 0; i < friendsList.size(); ++i)
+        {
+            String fid = friendsList.get(i).friendId;
+            if (fid.equals(id))
+            {
+                friendsList.remove(i);
+                return;
+            }
+        }
     }
 
     public String getId() {
