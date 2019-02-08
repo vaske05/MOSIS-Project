@@ -153,8 +153,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                           
                             List<Friend> friends= new ArrayList<>();
                             friends.add(new Friend("init"));
-                          
-                            storeUser(name, surname, email, phone,"0", friends);
+
                             //Store profile image
                             storeImage();
                             storeUser(name, surname, email, phone,0, friends, events);
