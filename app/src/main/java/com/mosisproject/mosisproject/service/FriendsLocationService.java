@@ -73,7 +73,6 @@ public class FriendsLocationService {
                 for(int i = 0; i < userIdList.size(); i++) {
                     User friend = dataSnapshot.child("Users").child(userIdList.get(i)).getValue(User.class);
                     if (friend != null) {
-                        //friendsList.add(friend);
                         addFriendToList(friend);
                     }
                 }
@@ -113,7 +112,6 @@ public class FriendsLocationService {
     }
 
     public void showLocationMarkers(){
-        //Log.i("TEST", "ShowMarkers");
         for(int i = 0; i < friendsList.size(); i++) {
             mapboxMap.addMarker(new MarkerOptions()
                     .position(new LatLng(friendsList.get(i).getUserLocation().getLatitude(), friendsList.get(i).getUserLocation().getLongitude()))

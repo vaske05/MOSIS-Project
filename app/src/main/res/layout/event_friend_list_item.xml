@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:id="@+id/event_friend_image"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:src="@mipmap/ic_launcher"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Full Name"
+        android:id="@+id/event_friend_full_name"
+        android:layout_toEndOf="@id/event_friend_image"
+        android:layout_toRightOf="@id/event_friend_image"
+        android:layout_marginLeft="5dp"
+        android:textSize="20dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="example@gmail.com"
+        android:id="@+id/event_friend_email"
+        android:layout_toEndOf="@id/event_friend_image"
+        android:layout_toRightOf="@id/event_friend_image"
+        android:layout_below="@id/event_friend_full_name"
+        android:layout_marginLeft="10dp"
+        android:textSize="15dp"/>
+
+    <RelativeLayout
+        android:gravity="right"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp">
+
+        <CheckBox
+            android:id="@+id/event_friend_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp" />
+    </RelativeLayout>
+</RelativeLayout>

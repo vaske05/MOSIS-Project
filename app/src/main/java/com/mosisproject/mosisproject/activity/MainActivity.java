@@ -35,6 +35,8 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mapbox.android.core.location.LocationEngineCallback;
+import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
@@ -48,6 +50,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.SupportMapFragment;
+import com.mosisproject.mosisproject.fragment.AddEventFragment;
 import com.mosisproject.mosisproject.fragment.RankingsFragment;
 import com.mosisproject.mosisproject.model.User;
 import com.mosisproject.mosisproject.module.GlideApp;
@@ -75,18 +78,13 @@ public class MainActivity extends AppCompatActivity
     private PermissionsManager permissionsManager;
     private MapboxMapOptions options;
     private FloatingActionButton mapSettingsBtn;
+    private FloatingActionButton addObject;
     private SwitchCompat drawerSwitch;
     private SwitchCompat showFriendsLocationSwitch;
     private SwitchCompat realTimeLocationSwitch;
     private Dialog dialog;
 
     private FirebaseDatabase firebaseDatabase;
-    List<String> userIdList = new ArrayList<>();
-    List<User> friendsList = new ArrayList<>();
-
-    private Timer timer;
-    private TimerTask timerTask;
-    private Handler handler = new Handler();
     private boolean switchChecked1;
     private boolean switchChecked2;
 
@@ -219,6 +217,8 @@ public class MainActivity extends AppCompatActivity
                 });
             }
         });
+
+        addObject = (FloatingActionButton) findViewById(R.id.add_object);
     }
 
     private void InitLocationService() {
@@ -256,8 +256,10 @@ public class MainActivity extends AppCompatActivity
         //Show/hide floating button. Show only on map fragment.
         if(fragment.getTag()== "com.mapbox.map") {
             mapSettingsBtn.show();
+            addObject.show();
         } else {
             mapSettingsBtn.hide();
+            addObject.hide();
         }
     }
 
@@ -294,8 +296,10 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_manage) {
             openMapFragment();
-        }  else if (id == R.id.nav_logout) {
+        } else if (id == R.id.nav_logout) {
             userLogout();
+        } else if(id == R.id.add_event) {
+            openAddEventFragment();
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -358,6 +362,13 @@ public class MainActivity extends AppCompatActivity
                 .load(sRef)
                 .transform(new RoundedCorners(15))
                 .into(imageView);
+    }
+
+    private void openAddEventFragment() {
+        AddEventFragment addEventFragment = new AddEventFragment();
+        addEventFragment.setMapboxMap(mapboxMap);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, addEventFragment, "fragment_addEvent").commit();
     }
 
     private void openFriendsFragment() {
