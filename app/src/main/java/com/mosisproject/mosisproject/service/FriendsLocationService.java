@@ -91,6 +91,7 @@ public class FriendsLocationService {
 
     public void loadEvents() {
 
+
     }
 
 
@@ -138,18 +139,21 @@ public class FriendsLocationService {
 
     public void showEventsMarkers() {
         for(int i = 0; i < eventList.size(); i++) {
-            String attenders = "";
+           /* String attenders = "";
+            if(eventList.get(i).attendersList == null) {
+                return;
+            }
             for(int j = 0; j < eventList.get(i).attendersList.size(); j++) {
                 attenders = eventList.get(i).attendersList.get(j).getName() + " "
                         + eventList.get(i).attendersList.get(j).getSurname()
                         + "\n";
-            }
+            }*/
 
             mapboxMap.addMarker(new MarkerOptions()
                     .position(new LatLng(eventList.get(i).getLatitude(), eventList.get(i).longitude))
                     .setTitle(eventList.get(i).getPlaceName())
                     .setSnippet("Description: " + eventList.get(i).description + "\n" +
-                            "Attenders: \n" + attenders)
+                            "Attenders: \n" /*+ attenders*/)
             );
         }
     }

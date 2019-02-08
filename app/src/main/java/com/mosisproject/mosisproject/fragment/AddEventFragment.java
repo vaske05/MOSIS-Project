@@ -209,7 +209,7 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
                         event.setDescription(descriptionText.getText().toString());
                         event.setLatitude(currentLocation.getLatitude());
                         event.setLongitude(currentLocation.getLongitude());
-                        event.setAttendersList(eventUsers);
+                        //event.setAttendersList(eventUsers);
                         storeEvent(event);
                     }
 
@@ -265,13 +265,6 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
         }
     }
 
-    public MapboxMap getMapboxMap() {
-        return mapboxMap;
-    }
-
-    public void setMapboxMap(MapboxMap mapboxMap) {
-        this.mapboxMap = mapboxMap;
-    }
 
     @Override
     public void onExplanationNeeded(List<String> permissionsToExplain) {
