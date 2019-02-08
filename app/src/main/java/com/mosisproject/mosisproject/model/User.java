@@ -45,8 +45,16 @@ public class User {
         this.friendsList.add(f);
     }
 
-    public void removeFriend(String friend) {//
-        this.friendsList.remove(friend);
+    public void removeFriend(String id) {//
+        for (int i = 0; i < friendsList.size(); ++i)
+        {
+            String fid = friendsList.get(i).friendId;
+            if (fid.equals(id))
+            {
+                friendsList.remove(i);
+                return;
+            }
+        }
     }
 
     public String getId() {
