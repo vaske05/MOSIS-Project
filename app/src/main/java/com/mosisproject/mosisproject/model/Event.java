@@ -5,7 +5,7 @@ import java.util.List;
 public class Event {
     public String description;
     public String placeName;
-    public List<String> attendersIds;
+    public List<User> attendersList;
     public double longitude;
     public double latitude;
 
@@ -32,16 +32,16 @@ public class Event {
         this.placeName = placeName;
     }
 
-    public List<String> getAttendersIds() {
-        return attendersIds;
+    public List<User> getAttendersList() {
+        return attendersList;
     }
 
-    public void setAttendersIds(List<String> attendersIds) {
-        this.attendersIds = attendersIds;
+    public void setAttendersList(List<User> attendersList) {
+        this.attendersList = attendersList;
     }
 
-    public void addAttender(String id) {
-        attendersIds.add(id);
+    public void addAttender(User user) {
+        attendersList.add(user);
     }
 
     public double getLongitude() {

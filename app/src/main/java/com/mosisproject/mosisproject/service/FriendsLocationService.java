@@ -24,6 +24,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mosisproject.mosisproject.model.Event;
 import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
 
@@ -47,6 +48,7 @@ public class FriendsLocationService {
 
     private List<Friend> userIdList = new ArrayList<>();
     private List<User> friendsList = new ArrayList<>();
+    private List<Event> eventList = new ArrayList<>();
 
     private Timer timer;
     private TimerTask timerTask;
@@ -69,6 +71,7 @@ public class FriendsLocationService {
                 friendsList.clear();
                 userIdList.clear();
                 final User userRecord = dataSnapshot.child("Users").child(user.getUid()).getValue(User.class);
+                eventList = userRecord.getEventList();
                 userIdList = userRecord.getFriendsList();
                 if (userIdList == null) return;
                 userIdList.remove(0);
@@ -85,6 +88,14 @@ public class FriendsLocationService {
             }
         });
     }
+
+    public void loadEvents() {
+
+    }
+
+
+
+
 
     private void addFriendToList(final User friend) {
         File localFile = null;
@@ -121,6 +132,24 @@ public class FriendsLocationService {
                     .icon(friendsList.get(i).getMarkerIcon())
                     .setTitle(friendsList.get(i).getName() + " " + friendsList.get(i).getSurname())
                     .setSnippet("Email:" + friendsList.get(i).getEmail() + "\n" + "Phone:" + friendsList.get(i).getPhone())
+            );
+        }
+    }
+
+    public void showEventsMarkers() {
+        for(int i = 0; i < eventList.size(); i++) {
+            String attenders = "";
+            for(int j = 0; j < eventList.get(i).attendersList.size(); j++) {
+                attenders = eventList.get(i).attendersList.get(j).getName() + " "
+                        + eventList.get(i).attendersList.get(j).getSurname()
+                        + "\n";
+            }
+
+            mapboxMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(eventList.get(i).getLatitude(), eventList.get(i).longitude))
+                    .setTitle(eventList.get(i).getPlaceName())
+                    .setSnippet("Description: " + eventList.get(i).description + "\n" +
+                            "Attenders: \n" + attenders)
             );
         }
     }

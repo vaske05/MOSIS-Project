@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity
 
         friendsLocationService = new FriendsLocationService(mapboxMap, this);
         friendsLocationService.loadFriends();
+        friendsLocationService.loadEvents();
 
         setupButtons(navigationView);
 
@@ -256,7 +257,7 @@ public class MainActivity extends AppCompatActivity
         //Show/hide floating button. Show only on map fragment.
         if(fragment.getTag()== "com.mapbox.map") {
             mapSettingsBtn.show();
-            addObject.show();
+            addObject.hide();
         } else {
             mapSettingsBtn.hide();
             addObject.hide();
@@ -453,6 +454,7 @@ public class MainActivity extends AppCompatActivity
     public void onMapReady(@NonNull MapboxMap _mapboxMap) {
         MainActivity.this.mapboxMap = _mapboxMap;
         friendsLocationService.setMapboxMap(mapboxMap);
+        friendsLocationService.showEventsMarkers();
         mapboxMap.addOnMapClickListener(new MapboxMap.OnMapClickListener() {
             @Override
             public boolean onMapClick(@NonNull LatLng point) {
