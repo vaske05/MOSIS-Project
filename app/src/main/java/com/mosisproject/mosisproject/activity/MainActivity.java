@@ -40,6 +40,7 @@ import com.mapbox.android.core.location.LocationEngineResult;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
@@ -89,7 +90,6 @@ public class MainActivity extends AppCompatActivity
     private boolean switchChecked1;
     private boolean switchChecked2;
     private boolean switchChecked3;
-
     private FriendsLocationService friendsLocationService;
 
 
@@ -469,6 +469,11 @@ public class MainActivity extends AppCompatActivity
         friendsLocationService.clearMarkers();
     }
 
+    public void GetId()
+    {
+
+    }
+
     @Override
     public void onMapReady(@NonNull MapboxMap _mapboxMap) {
         MainActivity.this.mapboxMap = _mapboxMap;
@@ -480,6 +485,8 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
+
+
         mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
             @Override
             public void onStyleLoaded(@NonNull Style style) {
