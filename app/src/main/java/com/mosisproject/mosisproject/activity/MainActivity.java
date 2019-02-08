@@ -82,11 +82,13 @@ public class MainActivity extends AppCompatActivity
     private SwitchCompat drawerSwitch;
     private SwitchCompat showFriendsLocationSwitch;
     private SwitchCompat realTimeLocationSwitch;
+    private SwitchCompat showEventsLocationSwitch;
     private Dialog dialog;
 
     private FirebaseDatabase firebaseDatabase;
     private boolean switchChecked1;
     private boolean switchChecked2;
+    private boolean switchChecked3;
 
     private FriendsLocationService friendsLocationService;
 
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity
         user = firebaseAuth.getCurrentUser();
         switchChecked1 = false;
         switchChecked2 = false;
+        switchChecked3 = false;
 
         subscribeToTopics(user.getUid());
 
@@ -179,19 +182,21 @@ public class MainActivity extends AppCompatActivity
 
                 showFriendsLocationSwitch = dialog.findViewById(R.id.showFriendsLocation);
                 realTimeLocationSwitch = dialog.findViewById(R.id.realTimeLocation);
+                showEventsLocationSwitch = dialog.findViewById(R.id.eventsLocation);
+
                 realTimeLocationSwitch.setClickable(switchChecked1);
                 showFriendsLocationSwitch.setClickable(!switchChecked2);
 
 
                 showFriendsLocationSwitch.setChecked(switchChecked1);
                 realTimeLocationSwitch.setChecked(switchChecked2);
+                showEventsLocationSwitch.setChecked(switchChecked3);
 
 
                 showFriendsLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (isChecked) {
-                            friendsLocationService.showEventsMarkers();
                             switchChecked1 = isChecked;
                             startFriendsLocationService();
                             realTimeLocationSwitch.setClickable(true);
@@ -214,6 +219,19 @@ public class MainActivity extends AppCompatActivity
                             switchChecked2 = isChecked;
                             friendsLocationService.stopTimer();
                             showFriendsLocationSwitch.setClickable(true);
+                        }
+                    }
+                });
+                showEventsLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if(isChecked) {
+                            friendsLocationService.loadFriends();
+                            switchChecked3 = isChecked;
+                            friendsLocationService.showEventsMarkers();
+                        } else {
+                            switchChecked3 = isChecked;
+                            friendsLocationService.clearMarkers();
                         }
                     }
                 });

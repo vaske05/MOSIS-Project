@@ -24,6 +24,13 @@
         android:layout_height="wrap_content"
         android:theme="@style/SCBSwitch"
         />
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/eventsLocation"
+        android:text="Events location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/SCBSwitch"
+        />
 
 
 

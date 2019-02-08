@@ -197,6 +197,7 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
         testBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                spinner.setVisibility(View.VISIBLE);
                 verification();
                 if(areFieldsValid) {
                     eventUsers = new ArrayList<>(eventFriendsAdapter.getEventUsers());
@@ -204,6 +205,7 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
                     if(eventUsers.isEmpty()) {
                         Toast.makeText(getContext(), "Please select at least one friend", Toast.LENGTH_LONG).show();
                     } else {
+
                         eventUsers.add(currentUser);
                         event.setPlaceName(placeNameText.getText().toString());
                         event.setDescription(descriptionText.getText().toString());
@@ -211,12 +213,24 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
                         event.setLongitude(currentLocation.getLongitude());
                         //event.setAttendersList(eventUsers);
                         storeEvent(event);
+                        spinner.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Event saved", Toast.LENGTH_LONG).show();
                     }
 
 
                 }
+                refreshFragment();
+
             }
+
         });
+    }
+
+    private void refreshFragment() {
+        AddEventFragment addEventFragment = new AddEventFragment();
+        //addEventFragment.setMapboxMap(mapboxMap);
+        getFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, addEventFragment, "fragment_addEvent").commit();
     }
 
     private void initCurrentUser() {
