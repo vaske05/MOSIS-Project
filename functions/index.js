@@ -52,7 +52,7 @@ exports.radiusNotification = functions.database.ref('Users/{userId}').onUpdate((
 			const diff = (currentTime - lastUpdate) / 1000;
 
 			console.info("Last update time: ", diff);
-			if (diff < 3600) {
+			if (diff < 15) {
 				console.info("User is already notified");
 				return null;
 			}
@@ -63,7 +63,7 @@ exports.radiusNotification = functions.database.ref('Users/{userId}').onUpdate((
 			if (diffDistance < 0.5) {
 				admin.database().ref('Users/' + userId + '/friendsList/' + index).set({
 					friendId : f.friendId,
-					lastUpdate : currentTime.toLocaleString()
+					lastUpdate : currentTime.toString()
 				  });
 
 				return admin.messaging().sendToTopic(`radiusNotification-${f.friendId}`, payload);

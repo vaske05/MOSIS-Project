@@ -11,14 +11,14 @@ public class Friend {
 
     public Friend()
     {
-        lastUpdate = new Date().toLocaleString();
+        lastUpdate = new Date().toString();
         friendId = "";
     }
 
     public Friend(String id)
     {
         friendId = id;
-        lastUpdate = new Date().toLocaleString();
+        lastUpdate = new Date().toString();
 
     }
 
