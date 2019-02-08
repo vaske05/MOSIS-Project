@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Go Bean</string>
+    <string name="app_name">Coffee time</string>
     <string name="title_activity_login">Log in</string>
     <string name="title_activity_registration">Registration</string>
     <string name="access_token">pk.eyJ1IjoibjNtYW5qNCIsImEiOiJjanF0dGRnbHgwZGMwNDdyeDJ1aGMwN2VmIn0.vpt5O-HzHp-iP42KQW70Lg</string>
