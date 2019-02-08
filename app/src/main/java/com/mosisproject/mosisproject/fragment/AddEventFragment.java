@@ -38,6 +38,7 @@ import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.adapter.EventFriendsAdapter;
 import com.mosisproject.mosisproject.adapter.FriendsAdapter;
 import com.mosisproject.mosisproject.model.Event;
+import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
 
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
 
     private String userId;
     private ListView listViewEventFriends;
-    private List<String> userIdList = new ArrayList<>();
+    private List<Friend> userIdList = new ArrayList<>();
     private List<User> userList = new ArrayList<>();
     List<User> eventUsers;
     private EventFriendsAdapter eventFriendsAdapter;
@@ -137,7 +138,7 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
                 userIdList = new ArrayList<>(user.getFriendsList());
                 userIdList.remove(0);
                 for(int i = 0; i < userIdList.size(); i++) {
-                    User friend = dataSnapshot.child("Users").child(userIdList.get(i)).getValue(User.class);
+                    User friend = dataSnapshot.child("Users").child(userIdList.get(i).getFriendId()).getValue(User.class);
                     if (friend != null) {
                         userList.add(friend);
                     }
