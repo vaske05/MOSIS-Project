@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
@@ -24,6 +25,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mosisproject.mosisproject.activity.MainActivity;
 import com.mosisproject.mosisproject.model.Event;
 import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
@@ -94,6 +96,27 @@ public class FriendsLocationService {
 
     }
 
+    public boolean DeleteEvent(Marker marker, String userId) {
+
+        String id = new StringBuilder()
+                .append(marker.getTitle())
+                .append(marker.getPosition().getLongitude())
+                .append(marker.getPosition().getLatitude())
+                .toString();
+
+        for (Event event: eventList
+             ) {
+            if (event.getEventId().equals(id))
+            {
+                eventList.remove(event);
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
+                databaseReference.child("Users").child(userId).child("eventList").setValue(eventList);
+                marker.remove();
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 
@@ -148,12 +171,15 @@ public class FriendsLocationService {
                         + eventList.get(i).attendersList.get(j).getSurname()
                         + "\n";
             }*/
-
+            String attenders = "";
+            for (String friendName: eventList.get(i).getFriendNames()) {
+                attenders += friendName + "\n";
+            }
             mapboxMap.addMarker(new MarkerOptions()
                     .position(new LatLng(eventList.get(i).getLatitude(), eventList.get(i).longitude))
                     .setTitle(eventList.get(i).getPlaceName())
                     .setSnippet("Description: " + eventList.get(i).description + "\n" +
-                            "Attenders: \n" /*+ attenders*/)
+                            "Attenders: \n" + attenders)
             );
         }
     }
