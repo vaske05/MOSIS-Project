@@ -84,12 +84,14 @@ public class MainActivity extends AppCompatActivity
     private SwitchCompat showFriendsLocationSwitch;
     private SwitchCompat realTimeLocationSwitch;
     private SwitchCompat showEventsLocationSwitch;
+    private SwitchCompat deleteEventsSwitch;
     private Dialog dialog;
 
     private FirebaseDatabase firebaseDatabase;
     private boolean switchChecked1;
     private boolean switchChecked2;
     private boolean switchChecked3;
+    private boolean switchChecked4;
     private FriendsLocationService friendsLocationService;
 
 
@@ -106,6 +108,7 @@ public class MainActivity extends AppCompatActivity
         switchChecked1 = false;
         switchChecked2 = false;
         switchChecked3 = false;
+        switchChecked4 = false;
 
         subscribeToTopics(user.getUid());
 
@@ -183,6 +186,7 @@ public class MainActivity extends AppCompatActivity
                 showFriendsLocationSwitch = dialog.findViewById(R.id.showFriendsLocation);
                 realTimeLocationSwitch = dialog.findViewById(R.id.realTimeLocation);
                 showEventsLocationSwitch = dialog.findViewById(R.id.eventsLocation);
+                deleteEventsSwitch = dialog.findViewById(R.id.deleteEventSwitch);
 
                 realTimeLocationSwitch.setClickable(switchChecked1);
                 showFriendsLocationSwitch.setClickable(!switchChecked2);
@@ -191,7 +195,7 @@ public class MainActivity extends AppCompatActivity
                 showFriendsLocationSwitch.setChecked(switchChecked1);
                 realTimeLocationSwitch.setChecked(switchChecked2);
                 showEventsLocationSwitch.setChecked(switchChecked3);
-
+                deleteEventsSwitch.setChecked(switchChecked4);
 
                 showFriendsLocationSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
@@ -233,6 +237,12 @@ public class MainActivity extends AppCompatActivity
                             switchChecked3 = isChecked;
                             friendsLocationService.clearMarkers();
                         }
+                    }
+                });
+                deleteEventsSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        switchChecked4 = isChecked;
                     }
                 });
             }
@@ -486,6 +496,17 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        mapboxMap.setOnMarkerClickListener(new MapboxMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(@NonNull Marker marker) {
+                if (deleteEventsSwitch.isChecked())
+                {
+                    friendsLocationService.DeleteEvent(marker, user.getUid());
+                    return true;
+                }
+                return false;
+            }
+        });
 
         mapboxMap.setStyle(Style.MAPBOX_STREETS, new Style.OnStyleLoaded() {
             @Override
@@ -493,7 +514,9 @@ public class MainActivity extends AppCompatActivity
                 enableLocationComponent();
             }
         });
+
     }
+
         @SuppressWarnings( {"MissingPermission"})
         private void enableLocationComponent() {
             // Check if permissions are enabled and if not request

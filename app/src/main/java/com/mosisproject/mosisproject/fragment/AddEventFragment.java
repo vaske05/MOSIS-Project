@@ -211,7 +211,10 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
                         event.setDescription(descriptionText.getText().toString());
                         event.setLatitude(currentLocation.getLatitude());
                         event.setLongitude(currentLocation.getLongitude());
-                        //event.setAttendersList(eventUsers);
+                        for(User user : eventUsers)
+                        {
+                            event.addFriendName(user.name);
+                        }
                         storeEvent(event);
                         spinner.setVisibility(View.GONE);
                         Toast.makeText(getContext(), "Event saved", Toast.LENGTH_LONG).show();
