@@ -25,7 +25,7 @@ import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mosisproject.mosisproject.activity.MainActivity;
+import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.model.Event;
 import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
@@ -162,25 +162,35 @@ public class FriendsLocationService {
 
     public void showEventsMarkers() {
         for(int i = 0; i < eventList.size(); i++) {
-           /* String attenders = "";
-            if(eventList.get(i).attendersList == null) {
-                return;
+
+            String location = context.getString(R.string.Restaurant);;
+            Icon icon = null;
+            IconFactory iconFactory = IconFactory.getInstance(context);
+
+            if (eventList.get(i).getLocationType() == Event.LocationType.TAVERN) {
+                icon = iconFactory.fromResource(R.drawable.green_marker);
+                location = context.getString(R.string.Tavern);
             }
-            for(int j = 0; j < eventList.get(i).attendersList.size(); j++) {
-                attenders = eventList.get(i).attendersList.get(j).getName() + " "
-                        + eventList.get(i).attendersList.get(j).getSurname()
-                        + "\n";
-            }*/
+            else if (eventList.get(i).getLocationType() == Event.LocationType.COFFEE_SHOP)
+            {
+                icon = iconFactory.fromResource(R.drawable.blue_marker);
+                location = context.getString(R.string.coffee_shop);
+            }
+
             String attenders = "";
-            for (String friendName: eventList.get(i).getFriendNames()) {
+            for (String friendName : eventList.get(i).getFriendNames()) {
                 attenders += friendName + "\n";
             }
-            mapboxMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(eventList.get(i).getLatitude(), eventList.get(i).longitude))
-                    .setTitle(eventList.get(i).getPlaceName())
+
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(new LatLng(eventList.get(i).getLatitude(), eventList.get(i).longitude))
+                    .setTitle(location + ": " + eventList.get(i).getPlaceName())
                     .setSnippet("Description: " + eventList.get(i).description + "\n" +
-                            "Attenders: \n" + attenders)
-            );
+                            "Attenders: \n" + attenders);
+
+            if (icon != null) markerOptions.icon(icon);
+
+            mapboxMap.addMarker(markerOptions);
         }
     }
 

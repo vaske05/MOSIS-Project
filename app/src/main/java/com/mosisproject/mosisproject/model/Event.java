@@ -1,7 +1,11 @@
 package com.mosisproject.mosisproject.model;
 
+import android.location.Location;
+
 import java.util.ArrayList;
 import java.util.List;
+
+
 
 public class Event {
     public String description;
@@ -10,6 +14,14 @@ public class Event {
     public List<String> friendNames;
     public double longitude;
     public double latitude;
+    public LocationType locationType;
+
+
+    public enum LocationType {
+        RESTAURANT,
+        TAVERN,
+        COFFEE_SHOP
+    }
 
     public Event() {
         friendNames = new ArrayList<>();
@@ -66,4 +78,13 @@ public class Event {
     public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
+
+    public LocationType getLocationType() {
+        return locationType;
+    }
+
+    public void setLocationType(LocationType locationType) {
+        this.locationType = locationType;
+    }
+
 }

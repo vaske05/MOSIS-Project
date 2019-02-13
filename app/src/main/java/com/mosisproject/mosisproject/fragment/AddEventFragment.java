@@ -1,12 +1,9 @@
 package com.mosisproject.mosisproject.fragment;
 
-import android.content.Context;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.PermissionChecker;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -32,11 +30,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.mapbox.android.core.permissions.PermissionsListener;
 import com.mapbox.android.core.permissions.PermissionsManager;
-import com.mapbox.mapboxsdk.location.LocationComponent;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mosisproject.mosisproject.R;
 import com.mosisproject.mosisproject.adapter.EventFriendsAdapter;
-import com.mosisproject.mosisproject.adapter.FriendsAdapter;
 import com.mosisproject.mosisproject.model.Event;
 import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
@@ -67,10 +63,10 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
 
     private EditText placeNameText;
     private EditText descriptionText;
-
     public Button testBtn;
     private Boolean areFieldsValid;
-
+    private RadioGroup radioGroup;
+    private Event.LocationType selectedLocationType = Event.LocationType.RESTAURANT;
     private ProgressBar spinner;
 
     private FusedLocationProviderClient mFusedLocationClient;
@@ -103,6 +99,7 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
         listViewEventFriends = view.findViewById(R.id.eventFriendsList);
         spinner = (ProgressBar) view.findViewById(R.id.spinnerEvent);
 
+
         firebaseDatabase = FirebaseDatabase.getInstance();
         firebaseStorage = FirebaseStorage.getInstance();
         storageReference = firebaseStorage.getReference();
@@ -117,10 +114,33 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
 
 
         initButton();
-
+        initRadioGroup(view);
         loadFriends(container);
 
         return view;
+    }
+
+    private void initRadioGroup(View view) {
+        radioGroup = (RadioGroup) view.findViewById(R.id.myRadioGroup);
+
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // find which radio button is selected
+                if(checkedId == R.id.restaurant) {
+                    selectedLocationType = Event.LocationType.RESTAURANT;
+
+                } else if(checkedId == R.id.tavern) {
+                    selectedLocationType = Event.LocationType.TAVERN;
+
+                } else {
+                    selectedLocationType = Event.LocationType.COFFEE_SHOP;
+
+                }
+            }
+
+        });
     }
 
     @Override
@@ -211,6 +231,7 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
                         event.setDescription(descriptionText.getText().toString());
                         event.setLatitude(currentLocation.getLatitude());
                         event.setLongitude(currentLocation.getLongitude());
+                        event.setLocationType(selectedLocationType);
                         for(User user : eventUsers)
                         {
                             event.addFriendName(user.name);

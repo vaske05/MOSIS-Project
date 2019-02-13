@@ -35,6 +35,33 @@
         android:hint="Description"
         android:inputType="textMultiLine" />
 
+    <RadioGroup
+        android:id="@+id/myRadioGroup"
+        android:layout_width="128dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text"
+        android:checkedButton="@+id/restaurant">
+
+        <RadioButton
+            android:id="@+id/restaurant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Restaurant" />
+
+        <RadioButton
+            android:id="@+id/tavern"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/Tavern" />
+
+        <RadioButton
+            android:id="@+id/coffee_shop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/coffee_shop" />
+
+    </RadioGroup>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

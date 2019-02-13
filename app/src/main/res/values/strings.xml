@@ -40,4 +40,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Tavern">Tavern</string>
+    <string name="Restaurant">Restaurant</string>
+    <string name="coffee_shop">Coffee shop</string>
 </resources>
