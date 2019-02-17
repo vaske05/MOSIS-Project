@@ -177,7 +177,9 @@ public class FriendsLocationService {
             }
 
             String attenders = "";
-            for (String friendName : eventList.get(i).getFriendNames()) {
+            List<String> friendNames = eventList.get(i).getFriendNames();
+            for (int i1 = 0; i1 < friendNames.size() - 1; i1++) {
+                String friendName = friendNames.get(i1);
                 attenders += friendName + "\n";
             }
 
