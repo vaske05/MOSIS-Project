@@ -163,18 +163,17 @@ public class FriendsLocationService {
     public void showEventsMarkers() {
         for(int i = 0; i < eventList.size(); i++) {
 
-            String location = context.getString(R.string.Restaurant);;
             Icon icon = null;
             IconFactory iconFactory = IconFactory.getInstance(context);
 
             if (eventList.get(i).getLocationType() == Event.LocationType.TAVERN) {
                 icon = iconFactory.fromResource(R.drawable.green_marker);
-                location = context.getString(R.string.Tavern);
+
             }
             else if (eventList.get(i).getLocationType() == Event.LocationType.COFFEE_SHOP)
             {
                 icon = iconFactory.fromResource(R.drawable.blue_marker);
-                location = context.getString(R.string.coffee_shop);
+
             }
 
             String attenders = "";
@@ -184,7 +183,7 @@ public class FriendsLocationService {
 
             MarkerOptions markerOptions = new MarkerOptions();
             markerOptions.position(new LatLng(eventList.get(i).getLatitude(), eventList.get(i).longitude))
-                    .setTitle(location + ": " + eventList.get(i).getPlaceName())
+                    .setTitle(eventList.get(i).getTitle())
                     .setSnippet("Description: " + eventList.get(i).description + "\n" +
                             "Attenders: \n" + attenders);
 

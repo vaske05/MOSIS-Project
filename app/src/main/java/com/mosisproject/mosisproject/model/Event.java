@@ -1,6 +1,9 @@
 package com.mosisproject.mosisproject.model;
 
+import android.content.res.Resources;
 import android.location.Location;
+
+import com.mosisproject.mosisproject.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +32,7 @@ public class Event {
 
     public String getEventId() {
         eventId = new StringBuilder()
-                .append(placeName)
+                .append(getTitle())
                 .append(longitude)
                 .append(latitude)
                 .toString();
@@ -45,6 +48,28 @@ public class Event {
 
     public String getDescription() {
         return description;
+    }
+    public String getTitle()
+    {
+        return new StringBuilder()
+                .append(LocationTypeToString())
+                .append(": ")
+                .append(placeName)
+                .toString();
+    }
+
+    private String LocationTypeToString()
+    {
+        String location = "Restaurant";
+
+        if (locationType == Event.LocationType.TAVERN) {
+            location = "Tavern";
+        }
+        else if (locationType == Event.LocationType.COFFEE_SHOP)
+        {
+            location = "Coffee shop";
+        }
+        return location;
     }
 
     public void addFriendName(String name) {
