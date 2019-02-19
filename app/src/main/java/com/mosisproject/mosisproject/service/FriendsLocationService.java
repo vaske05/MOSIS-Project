@@ -26,6 +26,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mosisproject.mosisproject.R;
+import com.mosisproject.mosisproject.filter.FilterHelper;
 import com.mosisproject.mosisproject.model.Event;
 import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
@@ -161,32 +162,34 @@ public class FriendsLocationService {
     }
 
     public void showEventsMarkers() {
-        for(int i = 0; i < eventList.size(); i++) {
+        FilterHelper.getInstance().setEvents((ArrayList<Event>) eventList);
+        ArrayList<Event> newList = FilterHelper.getInstance().FilterEvents();
+        for(int i = 0; i < newList.size(); i++) {
 
             Icon icon = null;
             IconFactory iconFactory = IconFactory.getInstance(context);
 
-            if (eventList.get(i).getLocationType() == Event.LocationType.TAVERN) {
+            if (newList.get(i).getLocationType() == Event.LocationType.TAVERN) {
                 icon = iconFactory.fromResource(R.drawable.green_marker);
 
             }
-            else if (eventList.get(i).getLocationType() == Event.LocationType.COFFEE_SHOP)
+            else if (newList.get(i).getLocationType() == Event.LocationType.COFFEE_SHOP)
             {
                 icon = iconFactory.fromResource(R.drawable.blue_marker);
 
             }
 
             String attenders = "";
-            List<String> friendNames = eventList.get(i).getFriendNames();
+            List<String> friendNames = newList.get(i).getFriendNames();
             for (int i1 = 0; i1 < friendNames.size() - 1; i1++) {
                 String friendName = friendNames.get(i1);
                 attenders += friendName + "\n";
             }
 
             MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(new LatLng(eventList.get(i).getLatitude(), eventList.get(i).longitude))
-                    .setTitle(eventList.get(i).getTitle())
-                    .setSnippet("Description: " + eventList.get(i).description + "\n" +
+            markerOptions.position(new LatLng(newList.get(i).getLatitude(), newList.get(i).longitude))
+                    .setTitle(newList.get(i).getTitle())
+                    .setSnippet("Description: " + newList.get(i).description + "\n" +
                             "Attenders: \n" + attenders);
 
             if (icon != null) markerOptions.icon(icon);

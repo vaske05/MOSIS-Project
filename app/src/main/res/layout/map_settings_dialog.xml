@@ -40,5 +40,11 @@
         android:text="Delete events"
         android:theme="@style/SCBSwitch"/>
 
+    <Button
+        android:id="@+id/filter_button"
+        android:layout_width="127dp"
+        android:layout_height="wrap_content"
+        android:text="Filter events" />
+
 
 </LinearLayout>

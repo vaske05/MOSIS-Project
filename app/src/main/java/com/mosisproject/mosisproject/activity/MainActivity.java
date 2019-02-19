@@ -24,6 +24,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -52,6 +53,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.SupportMapFragment;
 import com.mosisproject.mosisproject.fragment.AddEventFragment;
+import com.mosisproject.mosisproject.fragment.FilterFragment;
 import com.mosisproject.mosisproject.fragment.RankingsFragment;
 import com.mosisproject.mosisproject.model.User;
 import com.mosisproject.mosisproject.module.GlideApp;
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback, PermissionsListener {
 
     private static final int PERMISSIONS_REQUEST = 100;
-
+    private static final String TAG = "FILTER";
     private FirebaseAuth firebaseAuth;
     private FirebaseStorage firebaseStorage;
     private StorageReference storageReference;
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity
     private SwitchCompat realTimeLocationSwitch;
     private SwitchCompat showEventsLocationSwitch;
     private SwitchCompat deleteEventsSwitch;
+    private Button filterButton;
     private Dialog dialog;
 
     private FirebaseDatabase firebaseDatabase;
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity
     private boolean switchChecked2;
     private boolean switchChecked3;
     private boolean switchChecked4;
-    private FriendsLocationService friendsLocationService;
+    public FriendsLocationService friendsLocationService;
 
 
     @Override
@@ -156,7 +159,12 @@ public class MainActivity extends AppCompatActivity
         setupButtons(navigationView);
 
         InitLocationService();
-        openFriendsFragment();
+        openFragment(new FriendsFragment());
+    }
+
+    private void openFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment).commit();
     }
 
     private void setupButtons(NavigationView navigationView) {
@@ -187,6 +195,7 @@ public class MainActivity extends AppCompatActivity
                 realTimeLocationSwitch = dialog.findViewById(R.id.realTimeLocation);
                 showEventsLocationSwitch = dialog.findViewById(R.id.eventsLocation);
                 deleteEventsSwitch = dialog.findViewById(R.id.deleteEventSwitch);
+                filterButton = dialog.findViewById(R.id.filter_button);
 
                 realTimeLocationSwitch.setClickable(switchChecked1);
                 showFriendsLocationSwitch.setClickable(!switchChecked2);
@@ -243,6 +252,13 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         switchChecked4 = isChecked;
+                    }
+                });
+
+                filterButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        openFragment(new FilterFragment());
                     }
                 });
             }
@@ -315,21 +331,24 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
+        Fragment activeFragment;
         if (id == R.id.friends_list) {
-            openFriendsFragment();
+            openFragment(new FriendsFragment());
 
         } else if (id == R.id.add_friend) {
-            openAddFriendFragment();
+            openFragment(new AddFriendFragment());
 
         } else if (id == R.id.ranking) {
-            openRankingsFragment();
+            openFragment(new RankingsFragment());
 
         } else if (id == R.id.nav_manage) {
             openMapFragment();
+
         } else if (id == R.id.nav_logout) {
             userLogout();
+
         } else if(id == R.id.add_event) {
-            openAddEventFragment();
+            openFragment(new AddEventFragment());
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -394,34 +413,12 @@ public class MainActivity extends AppCompatActivity
                 .into(imageView);
     }
 
-    private void openAddEventFragment() {
-        AddEventFragment addEventFragment = new AddEventFragment();
-        //addEventFragment.setMapboxMap(mapboxMap);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, addEventFragment, "fragment_addEvent").commit();
-    }
+    public void openMapFragment() {
+        switchChecked1 = false;
+        switchChecked2 = false;
+        switchChecked3 = false;
+        switchChecked4 = false;
 
-    private void openFriendsFragment() {
-        FriendsFragment friendsFragment = new FriendsFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, friendsFragment, "fragment_friends").commit();
-        String tag = friendsFragment.getTag();
-        Log.w("TAG:", tag);
-    }
-
-    private void openAddFriendFragment() {
-        AddFriendFragment addFriendFragment = new AddFriendFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, addFriendFragment, "fragment_addFriend").commit();
-    }
-
-    private void openRankingsFragment() {
-        RankingsFragment rankingsFragment = new RankingsFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, rankingsFragment, "fragment_rankings").commit();
-    }
-
-    private void openMapFragment() {
         mapFragment = SupportMapFragment.newInstance(options);
         setTitle(R.string.navigation_map);
         getSupportFragmentManager().beginTransaction()
@@ -547,24 +544,28 @@ public class MainActivity extends AppCompatActivity
     public void onStart() {
         super.onStart();
         mapFragment.onStart();
+        Log.i(TAG, "onStart: ");
     }
 
     @Override
     public void onResume() {
         super.onResume();
         mapFragment.onResume();
+        Log.i(TAG, "onResume: ");
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mapFragment.onPause();
+        Log.i(TAG, "onPause: ");
     }
 
     @Override
     public void onStop() {
         super.onStop();
         mapFragment.onStop();
+        Log.i(TAG, "onStop: ");
     }
 
     @Override
@@ -577,5 +578,6 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mapFragment.onDestroy();
+        Log.i(TAG, "onDestroy: ");
     }
 }

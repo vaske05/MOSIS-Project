@@ -43,4 +43,5 @@
     <string name="Tavern">Tavern</string>
     <string name="Restaurant">Restaurant</string>
     <string name="coffee_shop">Coffee shop</string>
+    <string name="filter">Filter</string>
 </resources>

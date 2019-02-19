@@ -5,7 +5,9 @@ import android.location.Location;
 
 import com.mosisproject.mosisproject.R;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -14,6 +16,7 @@ public class Event {
     public String description;
     public String placeName;
     public String eventId;
+    public Date dateCreated;
     public List<String> friendNames;
     public double longitude;
     public double latitude;
@@ -46,6 +49,7 @@ public class Event {
         this.placeName = placeName;
     }
 
+    public Date getDateCreated() {return dateCreated; }
     public String getDescription() {
         return description;
     }

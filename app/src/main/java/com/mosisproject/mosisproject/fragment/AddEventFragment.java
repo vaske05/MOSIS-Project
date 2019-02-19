@@ -38,6 +38,7 @@ import com.mosisproject.mosisproject.model.Friend;
 import com.mosisproject.mosisproject.model.User;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class AddEventFragment extends Fragment implements PermissionsListener {
@@ -232,6 +233,7 @@ public class AddEventFragment extends Fragment implements PermissionsListener {
                         event.setLatitude(currentLocation.getLatitude());
                         event.setLongitude(currentLocation.getLongitude());
                         event.setLocationType(selectedLocationType);
+                        event.dateCreated = new Date();
                         for(User user : eventUsers)
                         {
                             event.addFriendName(user.name);
