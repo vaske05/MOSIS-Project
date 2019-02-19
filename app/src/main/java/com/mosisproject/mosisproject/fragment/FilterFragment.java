@@ -108,7 +108,6 @@ public class FilterFragment extends Fragment {
         public void onClick(View v) {
             setFilters();
             ((MainActivity)getActivity()).openMapFragment();
-            ((MainActivity)getActivity()).friendsLocationService.showEventsMarkers();
         }
 
     };
